@@ -1,0 +1,368 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appId": 1121683,
+    "appName": "Padel & Tennis Scoreboard",
+    "appType": "app",
+    "extType": "workout",
+    "version": {
+      "code": 1,
+      "name": "1.2.1"
+    },
+    "icon": "icon.png",
+    "vender": "Diggy",
+    "description": ""
+  },
+  "permissions": ["device:os.local_storage"],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "3.6",
+      "target": "3.6",
+      "minVersion": "3.6"
+    }
+  },
+  "targets": {
+    "common": {
+      "module": {
+        "data-widget": {
+          "widgets": [
+            {
+              "path": "data-widget/common/index",
+              "name": "Padel & Tennis Scoreboard",
+              "icon": "icon.png",
+              "window": {
+                "isPinned": 0
+              },
+              "runtime": {
+                "ability": [
+                  {
+                    "type": 1,
+                    "subType": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "app-side": {
+          "path": "app-side/index/index"
+        }
+      },
+      "platforms": [
+        {
+          "st": "r"
+        }
+      ],
+      "designWidth": 480
+    }
+  },
+  "i18n": {
+    "ar-EG": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "ca-ES": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "cs-CZ": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "da-DK": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "de-DE": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "el-GR": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "en-US": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "es-ES": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "fi-FI": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "fr-FR": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "iw-IL": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "hi-IN": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "hu-HU": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "id-ID": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "it-IT": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "ja-JP": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "ko-KR": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "ms-MY": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "nb-NO": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "nl-NL": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "pl-PL": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "pt-PT": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "pt-BR": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "ro-RO": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "ru-RU": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "sk-SK": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "sr-RS": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "sv-SE": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "th-TH": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "tr-TR": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "uk-UA": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "vi-VN": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "Padel & Tennis Scoreboard"
+          }
+        ]
+      }
+    },
+    "zh-CN": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "板式网球与网球记分牌"
+          }
+        ]
+      }
+    },
+    "zh-TW": {
+      "data-widget": {
+        "widgets": [
+          {
+            "name": "板式網球與網球記分牌"
+          }
+        ]
+      }
+    }
+  },
+  "defaultLanguage": "en-US"
+}
