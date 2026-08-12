@@ -1,5 +1,7 @@
 import { BaseSideService } from "@zeppos/zml/base-side";
+//import * as settings from "@zos/settings";
 const log = Logger.getLogger("app-side-service");
+
 
 //const log = Logger.getLogger("padel-tennis-side-service")
 
@@ -21,8 +23,10 @@ AppSideService(
       log.log("Received request:", req.method)
 
       if (req.method === "MATCH_FINISHED") {
+        const match = req.params.match
+
         log.log("MATCH FINISHED")
-        log.log(JSON.stringify(req.params))
+        log.log(JSON.stringify(match))
 
         res(null, {
           code: 0,
@@ -39,31 +43,3 @@ AppSideService(
     },
   })
 )
-
-
-
-/* AppSettingsPage(
-  BaseSideService({
-    onInit(e) {
-      log.log("app-side-service onInit invoked", e);
-    },
-
-    onRun(e) {
-      log.log("app-side-service onEvent invoked", e);
-    },
-
-    onDestroy() {
-      log.log("app-side-service onDestroy invoked");
-    },
-
-    onRequest(req, res) {
-      switch (req.method) {
-        case 'your-method':
-          res(null, {
-            code: 0,
-            message: 'success',
-          })
-      }
-    }
-  })
-); */

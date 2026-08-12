@@ -250,7 +250,11 @@ export function playerWonPoint(player) {
   
   // Win match
   if (winner.sets >= settings.bestOf/2 + 0.5){
-      resetMatch()
+    const finishedMatch = JSON.parse(JSON.stringify(match))
+    
+    resetMatch()
+
+    return finishedMatch
   }
 }
 export function saveState() {

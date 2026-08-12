@@ -16,7 +16,7 @@ let moreSettingsGroup
 
 DataWidget(
   BasePage({
-    init() {
+    init(page) {
 
       loadMatch()
       loadSettings()
@@ -568,7 +568,22 @@ DataWidget(
         press_color: 0xff85ff,
         click_func: () => {
           saveState()
-          playerWonPoint(PLAYER_1)
+
+          const finishedMatch = playerWonPoint(PLAYER_1)
+          
+          //playerWonPoint(PLAYER_1)
+
+          if (finishedMatch) {
+            page.request({
+              method: "MATCH_FINISHED",
+              params: {
+                match: finishedMatch
+              }
+            }).then((data) => {
+              page.log("Match sent:", data)
+            })
+          }
+
           saveMatch()
           refreshUI()
         }
@@ -589,7 +604,20 @@ DataWidget(
 
         click_func: () => {
           saveState()
-          playerWonPoint(PLAYER_2)
+          const finishedMatch = playerWonPoint(PLAYER_2)
+          
+          //playerWonPoint(PLAYER_2)
+
+          if (finishedMatch) {
+            page.request({
+              method: "MATCH_FINISHED",
+              params: {
+                match: finishedMatch
+              }
+            }).then((data) => {
+              page.log("Match sent:", data)
+            })
+          }
           saveMatch()
           refreshUI()
         }
@@ -681,18 +709,20 @@ DataWidget(
     },
 
     build() {
-      this.init()
+      this.init(this)
     },
     
     onInit() {
-      this.request({
-        method: "your-method",
+      /* this.request({
+        method: "MATCH_FINISHED",
         params: {
-          name: "foo",
-        },
+        winner: "player1",
+        player1Sets: 2,
+        player2Sets: 1
+  }
       }).then((data) => {
         this.log("result=>", data);
-      });
+      }); */
     },
 
     onDestroy() {},
