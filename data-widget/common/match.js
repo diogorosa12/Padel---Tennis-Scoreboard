@@ -7,12 +7,15 @@ export function createNewMatch(firstServe = true, deuce = 0) {
     player1: {
       pointIndex: 0,
       games: 0,
-      sets: 0
+      sets: 0,
+      result: []
     },
     player2: {
       pointIndex: 0,
       games: 0,
-      sets: 0
+      sets: 0,
+      result: []
+
     },
     advantage: null,
     serve: firstServe,
@@ -81,12 +84,22 @@ export function awardGame(winner) {
   changeServe()
   resetPoints()
 }
+
+export function saveSetScore(result1, result2) {
+  match.player1.result.push(result1)
+  match.player2.result.push(result2)
+}
+
 export function awardSet(winner) {
   winner.sets++
   if(match.firstServe === match.serve){
-      changeServe()
+    changeServe()
   }
   match.firstServe = match.serve
+
+  console.log('player 1', match.player1.result)
+  console.log('player 2', match.player2.result)
+
   match.player1.games = 0
   match.player2.games = 0
   resetPoints()
@@ -148,21 +161,21 @@ export function pingPongMode(winner, loser, diffPoints, deuce = false) {
   }
   // Award game to player
   if(winner.pointIndex >= getSettings().tieBreak && diffPoints >= 2){
-    awardGame(winner)
-    if((winner.pointIndex + loser.pointIndex)%4 === 0 || ((winner.pointIndex + loser.pointIndex)%4) === 1){
-      changeServe()
-    }
+
+    saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
+
+    awardSet(winner)
   }
 }
 
 export function playerWonPoint(player) {
-  let deuceFlag
+  let deuceFlag = false
   const settings = getSettings()
   
   const winner = match[player]
   const loser = player === 'player1' ? match.player2 : match.player1
   
-  // Increment player 1 point index
+  // Increment winner point index
   winner.pointIndex++
   const diffPoints = Math.abs(winner.pointIndex - loser.pointIndex)
   
@@ -174,6 +187,15 @@ export function playerWonPoint(player) {
     }
     // Award set to player
     if(winner.pointIndex >= settings.tieBreak && diffPoints >= 2){
+      winner.games++
+      
+      if(settings.tieBreakMode && Math.abs(winner.sets - loser.sets) === 0 && winner.sets === settings.bestOf/2 + 0.5 - 1) {
+        saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
+      }
+      else{
+        saveSetScore(match.player1.games, match.player2.games)
+      }
+    
       awardSet(winner)
     }
   }
@@ -184,9 +206,6 @@ export function playerWonPoint(player) {
         deuceFlag = true
       }
       pingPongMode(winner, loser, diffPoints, deuceFlag)
-      if(settings.games + 1 === winner.games){
-        awardSet(winner)
-      }
     }
     // Normal game
     else{
@@ -236,6 +255,7 @@ export function playerWonPoint(player) {
     }
     // Award set to player
     if ((winner.games >= settings.games && diffGames >= Math.min(2, settings.games))){
+      saveSetScore(match.player1.games, match.player2.games)
       awardSet(winner)
     }     
 
