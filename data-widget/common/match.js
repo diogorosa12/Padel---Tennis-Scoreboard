@@ -86,8 +86,8 @@ export function awardGame(winner) {
 }
 
 export function saveSetScore(result1, result2) {
-  match.player1.result.push(result1)
-  match.player2.result.push(result2)
+  match.player1.result.push(JSON.parse(JSON.stringify(result1)))
+  match.player2.result.push(JSON.parse(JSON.stringify(result2)))
 }
 
 export function awardSet(winner) {
