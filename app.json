@@ -7,7 +7,7 @@
     "extType": "workout",
     "version": {
       "code": 1,
-      "name": "1.2.3"
+      "name": "1.2.4"
     },
     "icon": "icon.png",
     "vender": "Diggy",
@@ -46,6 +46,9 @@
         },
         "app-side": {
           "path": "app-side/index/index"
+        },
+        "setting": {
+          "path": "setting/index"
         }
       },
       "platforms": [

@@ -713,16 +713,6 @@ DataWidget(
     },
     
     onInit() {
-      /* this.request({
-        method: "MATCH_FINISHED",
-        params: {
-        winner: "player1",
-        player1Sets: 2,
-        player2Sets: 1
-  }
-      }).then((data) => {
-        this.log("result=>", data);
-      }); */
     },
 
     onDestroy() {},
