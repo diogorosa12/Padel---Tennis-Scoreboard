@@ -1,6 +1,6 @@
 import { POINTS } from './constants'
 import { getMatch } from './match'
-import { getSettings, SETS } from './settings'
+import { getSettings } from './settings'
 
 
 export function getPointText(player) {
