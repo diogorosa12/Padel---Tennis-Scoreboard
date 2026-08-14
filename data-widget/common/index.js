@@ -1,7 +1,7 @@
 import { createWidget, widget, align, text_style, sport_data, edit_widget_group_type, prop } from '@zos/ui'
 import { localStorage } from "@zos/storage"
 import { undoHelper, getMatch, getServer, resetMatch, playerWonPoint, saveState, undo } from './match'
-import { POINTS, PLAYER_1, PLAYER_2 } from './constants'
+import { POINTS, PLAYER_1, PLAYER_2, SCREEN_WIDTH, SCREEN_HEIGHT } from './constants'
 import { saveMatch, loadMatch } from './storage'
 import { getPointText } from './helpers'
 import {getSettings, loadSettings, saveSettings, setFirstServe, setDeuce, setSets, getSets, getGames, setGames, getTieBreak, setTieBreak } from "./settings"
@@ -13,6 +13,7 @@ let deuceOption
 let serveOption
 let originalSettings
 let moreSettingsGroup
+let menuGroup
 
 DataWidget(
   BasePage({
@@ -21,28 +22,48 @@ DataWidget(
       loadMatch()
       loadSettings()
 
+      // Create display groups
       matchGroup = createWidget(widget.GROUP, {
         x: 0,
         y: 0,
-        w: 466,
-        h: 466
+        w: SCREEN_WIDTH,
+        h: SCREEN_HEIGHT
       })
 
       settingsGroup = createWidget(widget.GROUP, {
         x: 0,
         y: 0,
-        w: 466,
-        h: 466
+        w: SCREEN_WIDTH,
+        h: SCREEN_HEIGHT
       })
 
       moreSettingsGroup = createWidget(widget.GROUP, {
         x: 0,
         y: 0,
-        w: 466,
-        h: 466
+        w: SCREEN_WIDTH,
+        h: SCREEN_HEIGHT
       })
 
+      menuGroup = createWidget(widget.GROUP, {
+        x: 0,
+        y: 0,
+        w: SCREEN_WIDTH,
+        h: SCREEN_HEIGHT
+      })
+
+      function showMenu() {
+        menuGroup.setProperty(prop.VISIBLE, true)
+        matchGroup.setProperty(prop.VISIBLE, false)
+        settingsGroup.setProperty(prop.VISIBLE, false)
+        deuceOption.setProperty(prop.VISIBLE, false)
+        serveOption.setProperty(prop.VISIBLE, false)
+        moreSettingsGroup.setProperty(prop.VISIBLE, false)
+        tieBreakOption.setProperty(prop.VISIBLE, false)
+        pingPongOption.setProperty(prop.VISIBLE, false)
+      }
+
       function showMatch() {
+        menuGroup.setProperty(prop.VISIBLE, false)
         matchGroup.setProperty(prop.VISIBLE, true)
         settingsGroup.setProperty(prop.VISIBLE, false)
         deuceOption.setProperty(prop.VISIBLE, false)
@@ -56,11 +77,12 @@ DataWidget(
       }
 
       function showSettings(flag = false) {
+        
         if(!flag){
           originalSettings = JSON.parse(JSON.stringify(getSettings()))
           saveMatch()
         }
-        
+        menuGroup.setProperty(prop.VISIBLE, false)
         matchGroup.setProperty(prop.VISIBLE, false)
         settingsGroup.setProperty(prop.VISIBLE, true)
         deuceOption.setProperty(prop.VISIBLE, true)
@@ -72,6 +94,7 @@ DataWidget(
       }
 
       function showMoreSettings() {
+
         settingsGroup.setProperty(prop.VISIBLE, false)
         deuceOption.setProperty(prop.VISIBLE, false)
         serveOption.setProperty(prop.VISIBLE, false)
@@ -83,11 +106,10 @@ DataWidget(
         pingPongOption.setProperty(prop.VISIBLE, true)
       }
       
-      const y = 30
-      const x = 15
+      // MORE SETTINGS SCREEN
       const setsText = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: 45 + x,
-        y: 65 - y,
+        x: 60,
+        y: 35,
         w: 233,
         h: 170,
         text: `BEST OF`,
@@ -98,8 +120,8 @@ DataWidget(
       })
 
       const setsNumber = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: (466*3/4 + 466/2 - 50)/2 + x,
-        y: 125- y,
+        x: SCREEN_WIDTH * 5 / 8 - 10,
+        y: 95,
         w: 50,
         h: 50,
         text: `${getSets()}`,
@@ -110,8 +132,8 @@ DataWidget(
       })
 
       const plusSetsButton = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466*3/4 + x,
-        y: 125- y,
+        x: SCREEN_WIDTH * 3 / 4 + 15,
+        y: 95,
         w: 60,
         h: 50,
         text: `+`,
@@ -127,8 +149,8 @@ DataWidget(
       })
 
       const minusSetsButton = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466/2 - 50 + x,
-        y: 120- y,
+        x: SCREEN_WIDTH / 2 - 35,
+        y: 90,
         w: 60,
         h: 50,
         text: `-`,
@@ -144,8 +166,8 @@ DataWidget(
       })
 
       const gamesText = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: 0 + x,
-        y: 65 + 80- y,
+        x: 15,
+        y: 115,
         w: 200,
         h: 170,
         text: `GAMES`,
@@ -156,8 +178,8 @@ DataWidget(
       })
 
       const gamesNumber = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: (466*3/4 + 466/2 - 50)/2 - 2 + x,
-        y: 125 + 80- y,
+        x: SCREEN_WIDTH * 5 / 8 - 12,
+        y: 175,
         w: 54,
         h: 50,
         text: `${getGames()}`,
@@ -168,8 +190,8 @@ DataWidget(
       })
 
       const plusGamesButton = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466*3/4 + x,
-        y: 125 + 80- y,
+        x: SCREEN_WIDTH * 3 / 4 + 15,
+        y: 175,
         w: 60,
         h: 50,
         text: `+`,
@@ -185,8 +207,8 @@ DataWidget(
       })
 
       const minusGamesButton = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466/2 - 50 + x,
-        y: 120 + 80- y,
+        x: SCREEN_WIDTH / 2 - 35,
+        y: 170,
         w: 60,
         h: 50,
         text: `-`,
@@ -202,8 +224,8 @@ DataWidget(
       })
 
       const tieBreakText = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: 0 + x,
-        y: 65 + 80 + 80- y,
+        x: 15,
+        y: 195,
         w: 200,
         h: 170,
         text: `TIEBREAK`,
@@ -214,8 +236,8 @@ DataWidget(
       })
 
       const tieBreakNumber = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: (466*3/4 + 466/2 - 50)/2 - 2 + x,
-        y: 125 + 80 + 80- y,
+        x: SCREEN_WIDTH * 5 / 8 - 12,
+        y: 255,
         w: 56,
         h: 50,
         text: `${getTieBreak()}`,
@@ -226,8 +248,8 @@ DataWidget(
       })
 
       const plusTieBreakButton = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466*3/4 + x,
-        y: 125 + 80 + 80- y,
+        x: SCREEN_WIDTH * 3 / 4 + 15,
+        y: 255,
         w: 60,
         h: 50,
         text: `+`,
@@ -243,8 +265,8 @@ DataWidget(
       })
 
       const minusTieBreakButton = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466/2 - 50 + x,
-        y: 120 + 80 + 80- y,
+        x: SCREEN_WIDTH / 2 - 35,
+        y: 250,
         w: 60,
         h: 50,
         text: `-`,
@@ -262,7 +284,7 @@ DataWidget(
       const tieBreakTypes = moreSettingsGroup.createWidget(widget.TEXT, {
         x: 140,
         y: 320,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 50,
         text: `On`,
         text_size: 26,
@@ -274,7 +296,7 @@ DataWidget(
       tieBreakOption = createWidget(widget.CHECKBOX_GROUP, {
         x: 0,
         y: 0,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 64,
         select_src: 'selected.png',
         unselect_src: 'unselected.png',
@@ -313,7 +335,7 @@ DataWidget(
       pingPongOption = createWidget(widget.CHECKBOX_GROUP, {
         x: 0,
         y: 0,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 64,
         select_color: 0xffffff,
         unselect_color: 0x00000,
@@ -329,7 +351,6 @@ DataWidget(
             tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
             setGames(2)
             gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
-      
           }
           if(checked === false){
             tieBreakText.setProperty(prop.TEXT, 'TIEBREAK')
@@ -360,22 +381,9 @@ DataWidget(
         pingPongOption.setProperty(prop.INIT, button6)
       }
 
-      const moreSettingsButton = settingsGroup.createWidget(widget.BUTTON, {
-        x: 466/2 + 60,
-        y: 466 - 150,
-        w: 100,
-        h: 80,
-        normal_src: 'settings6.png',
-        press_src: 'settings_pressed.png',
-
-        click_func: () => {
-          showMoreSettings()
-        }
-      })
-
       const backButton2 = moreSettingsGroup.createWidget(widget.BUTTON, {
-        x: 466/2 - 60,
-        y: 466 - 135,
+        x: SCREEN_WIDTH / 2 - 60,
+        y: SCREEN_HEIGHT - 135,
         w: 120,
         h: 80,
         normal_src: 'serve.png',
@@ -385,14 +393,29 @@ DataWidget(
           saveSettings()
           
           refreshUI()
-          showSettings(true)
+          showSettings(true, newGameFlag)
+        }
+      })
+
+
+      // SETTINGS SCREEN
+      const moreSettingsButton = settingsGroup.createWidget(widget.BUTTON, {
+        x: SCREEN_WIDTH / 2 + 60,
+        y: SCREEN_HEIGHT - 150,
+        w: 100,
+        h: 80,
+        normal_src: 'settings6.png',
+        press_src: 'settings_pressed.png',
+
+        click_func: () => {
+          showMoreSettings(newGameFlag)
         }
       })
 
       const deuceText = settingsGroup.createWidget(widget.TEXT, {
         x: 0,
         y: 65,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 50,
         text: `DEUCE`,
         text_size: 30,
@@ -402,9 +425,9 @@ DataWidget(
       })
       
       const deuceTypes = settingsGroup.createWidget(widget.TEXT, {
-        x: 466/4 - 70,
+        x: SCREEN_WIDTH / 4 - 70,
         y: 147,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 40,
         text: `SP              AD             GP`,
         text_size: 30,
@@ -416,7 +439,7 @@ DataWidget(
       deuceOption = createWidget(widget.RADIO_GROUP, {
         x: 0,
         y: 0,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 60,
         select_src: 'selected.png',
         unselect_src: 'unselected.png',
@@ -429,19 +452,19 @@ DataWidget(
       })
       
       const button1 = deuceOption.createWidget(widget.STATE_BUTTON, {
-        x: 466/4 - 20,
+        x: SCREEN_WIDTH / 4 - 20,
         y: 140,
         w: 64,
         h: 64
       })
       const button2 = deuceOption.createWidget(widget.STATE_BUTTON, {
-        x: 466/2,
+        x: SCREEN_WIDTH / 2,
         y: 140,
         w: 64,
         h: 64
       })
       const button3 = deuceOption.createWidget(widget.STATE_BUTTON, {
-        x: 466*3/4 + 20,
+        x: SCREEN_WIDTH * 3 / 4 + 20,
         y: 140,
         w: 64,
         h: 64
@@ -453,7 +476,7 @@ DataWidget(
       const serveTypes = settingsGroup.createWidget(widget.TEXT, {
         x: 120,
         y: 280,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 50,
         text: `Player 1`,
         text_size: 26,
@@ -465,7 +488,7 @@ DataWidget(
       const serveText = settingsGroup.createWidget(widget.TEXT, {
         x: 0,
         y: 220,
-        w: 466,
+        w: SCREEN_WIDTH,
         h: 40,
         text: `FIRST SERVE`,
         text_size: 30,
@@ -522,10 +545,32 @@ DataWidget(
         )
       }
 
+      const backButton = settingsGroup.createWidget(widget.BUTTON, {
+        x: SCREEN_WIDTH / 2 - 60,
+        y: SCREEN_HEIGHT - 135,
+        w: 120,
+        h: 80,
+        normal_src: 'serve.png',
+        press_src: 'undo_press.png',
+
+        click_func: () => {
+          saveSettings()
+          
+          if (originalSettings.firstServe != getSettings().firstServe || originalSettings.pingPong != getSettings().pingPong) {
+            resetMatch()
+            saveMatch()
+          }
+          
+          refreshUI()
+          showMatch()
+        }
+      })
+
+      //SCOREBOARD SCREEN
       // Core text
       const baseText = matchGroup.createWidget(widget.TEXT, {
-        x: 466/2 - 125 - 10,
-        y: 126 - 10,
+        x: SCREEN_WIDTH / 2 - 135,
+        y: 116,
         w: 100,
         h: 173,
         text: `GAME\nSET\n\nGAME\nSET`,
@@ -537,8 +582,8 @@ DataWidget(
 
       // Score text
       const pointText = matchGroup.createWidget(widget.TEXT, {
-        x: 466/2 - 25 - 10,
-        y: 126 - 10,
+        x: SCREEN_WIDTH / 2 - 35,
+        y: 116,
         w: 30,
         h: 173,
         text: `${getMatch().player1.games}\n${getMatch().player1.sets}\n\n${getMatch().player2.games}\n${getMatch().player2.sets}`,
@@ -549,15 +594,15 @@ DataWidget(
       })
 
       const serveImg = matchGroup.createWidget(widget.IMG, {
-        x: 466/2 - 170 - 10,
-        y: 134 - 10,
+        x: SCREEN_WIDTH / 2 - 180,
+        y: 124,
         src: 'serve.png'
       })
       
       // Player 1 button
       const player1Button = matchGroup.createWidget(widget.BUTTON, {
-        x: 466/2 + 50 - 10,
-        y: 115 - 10,
+        x: SCREEN_WIDTH / 2 + 40,
+        y: 105,
         w: 130,
         h: 78,
         text: `${POINTS[getSettings().deuce][getMatch().player1.pointIndex]}`,
@@ -571,8 +616,6 @@ DataWidget(
 
           const finishedMatch = playerWonPoint(PLAYER_1)
           
-          //playerWonPoint(PLAYER_1)
-
           if (finishedMatch) {
             page.request({
               method: "MATCH_FINISHED",
@@ -591,8 +634,8 @@ DataWidget(
 
       // Player 2 button
       const player2Button = matchGroup.createWidget(widget.BUTTON, {
-        x: 466/2 + 50 - 10,
-        y: 230 - 10,
+        x: SCREEN_WIDTH / 2 + 40,
+        y: 220,
         w: 130,
         h: 78,
         text: `${POINTS[getSettings().deuce][getMatch().player2.pointIndex]}`,
@@ -606,8 +649,6 @@ DataWidget(
           saveState()
           const finishedMatch = playerWonPoint(PLAYER_2)
           
-          //playerWonPoint(PLAYER_2)
-
           if (finishedMatch) {
             page.request({
               method: "MATCH_FINISHED",
@@ -624,8 +665,8 @@ DataWidget(
       })
 
       const undoButton = matchGroup.createWidget(widget.BUTTON, {
-        x: 466/2 - 60,
-        y: 466 - 150,
+        x: SCREEN_WIDTH / 2 - 60,
+        y: SCREEN_HEIGHT - 150,
         w: 120,
         h: 80,
         normal_src: 'undo_normal.png',
@@ -647,8 +688,8 @@ DataWidget(
       })
 
       const settingsButton = matchGroup.createWidget(widget.BUTTON, {
-        x: 466/2 + 60,
-        y: 466 - 150,
+        x: SCREEN_WIDTH / 2 + 60,
+        y: SCREEN_HEIGHT - 150,
         w: 100,
         h: 80,
         normal_src: 'settings6.png',
@@ -666,8 +707,8 @@ DataWidget(
         default_type: sport_data.HR,
         optional_types: widgetOptionalArray2,
         count: widgetOptionalArray2.length,
-        x: 466/2 - 50,
-        y: 466 - 62,
+        x: SCREEN_WIDTH / 2 - 50,
+        y: SCREEN_HEIGHT - 62,
         w: 150,
         h: 50,
         rect_visible: false,
@@ -675,37 +716,70 @@ DataWidget(
         text_size: 33,
 
       })
-      
-      const backButton = settingsGroup.createWidget(widget.BUTTON, {
-        x: 466/2 - 60,
-        y: 466 - 135,
-        w: 120,
-        h: 80,
-        normal_src: 'serve.png',
-        press_src: 'undo_press.png',
-
-        click_func: () => {
-          saveSettings()
-          
-          if (originalSettings.firstServe != getSettings().firstServe || originalSettings.pingPong != getSettings().pingPong) {
-            
-            resetMatch()
-            saveMatch()
-          }
-          
-          refreshUI()
-          showMatch()
-        }
-      })
 
       const hrImg = createWidget(widget.IMG, {
-        x: 466/2 - 30 - 20,
-        y: 466 - 24 - 30,
+        x: SCREEN_WIDTH / 2 - 50,
+        y: SCREEN_HEIGHT - 54,
         src: 'heart.png'
       })
       
-      showMatch()
-      refreshUI()
+      /* showMatch()
+      refreshUI() */
+
+      //MENU SCREEN
+      
+      const title = menuGroup.createWidget(widget.TEXT, {
+        x: SCREEN_WIDTH / 2 - 150,
+        y: 35,
+        w: 350,
+        h: 170,
+        text: `PADEL & TENNIS`,
+        text_size: 40,
+        color: 0xffffff,
+        align_h: align.LEFT,
+        align_v: align.CENTER_V
+      })
+
+      const newGameButton = menuGroup.createWidget(widget.BUTTON, {
+        x: SCREEN_WIDTH / 2 - 80,
+        y: 160,
+        w: 160,
+        h: 50,
+        text: `NEW GAME`,
+        text_size: 30,
+        color: 0xffffff,
+        radius: 20,
+        normal_color: 0x000000,
+        press_color: 0xffffff,
+        click_func: () => {
+          
+          resetMatch()
+          saveMatch()
+          
+          refreshUI()
+          showMatch()
+          
+        }
+      })   
+
+      const resumeGameButton = menuGroup.createWidget(widget.BUTTON, {
+        x: SCREEN_WIDTH / 2 - 125,
+        y: 230,
+        w: 250,
+        h: 50,
+        text: `RESUME GAME`,
+        text_size: 30,
+        color: 0xffffff,
+        radius: 20,
+        normal_color: 0x000000,
+        press_color: 0xffffff,
+        click_func: () => {
+          showMatch()
+          refreshUI()
+        }
+      })   
+      
+      showMenu()
     },
 
     build() {

@@ -4,6 +4,7 @@ let history = []
 
 export function createNewMatch(firstServe = true, deuce = 0) {
   return {
+    timestamp: Date.now(),
     player1: {
       pointIndex: 0,
       games: 0,
@@ -271,6 +272,7 @@ export function playerWonPoint(player) {
   // Win match
   if (winner.sets >= settings.bestOf/2 + 0.5){
     const finishedMatch = JSON.parse(JSON.stringify(match))
+    finishedMatch.pingPong = settings.pingPong
     
     resetMatch()
 

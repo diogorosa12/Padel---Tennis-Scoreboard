@@ -2,11 +2,23 @@ import { BaseSideService } from "@zeppos/zml/base-side"
 
 const log = Logger.getLogger("app-side-service")
 const MATCH_HISTORY_KEY = "matchHistory"
+const DEFAULT_SPORT_KEY = "defaultSport"
+const RACKET_SPORTS = ["padel", "tennis"]
 
 
-function createMatchRecord(match) {
+function getDefaultSport(service) {
+  const stored = service.settings.getItem(DEFAULT_SPORT_KEY)
+
+  return RACKET_SPORTS.includes(stored) ? stored : "padel"
+}
+
+
+function createMatchRecord(service, match) {
   return {
-    timestamp: Date.now(),
+    startTime: match.timestamp,
+    duration: Date.now() - match.timestamp,
+    
+    sport: match.pingPong === true ? "tableTennis" : getDefaultSport(service),
 
     player1: {
       sets: match.player1.sets,
@@ -78,7 +90,7 @@ AppSideService(
         log.log("MATCH FINISHED")
         log.log(JSON.stringify(match))
 
-        const record = createMatchRecord(match)
+        const record = createMatchRecord(this, match)
 
         log.log("MATCH RECORD")
         log.log(JSON.stringify(record))

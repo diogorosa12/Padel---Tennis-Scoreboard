@@ -6,9 +6,5 @@ export const PLAYER_2 = 'player2'
 
 export const STORAGE_KEY = "padel_match"
 export const SETTINGS_KEY = "settings"
-
-
-export const OFFSCREEN = {
-  x: 0,
-  y: 0
-}
+export const SCREEN_WIDTH = 466
+export const SCREEN_HEIGHT = 466
