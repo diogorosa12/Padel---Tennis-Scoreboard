@@ -7,13 +7,13 @@
     "extType": "workout",
     "version": {
       "code": 1,
-      "name": "1.2.5"
+      "name": "1.2.6"
     },
     "icon": "icon.png",
     "vender": "Diggy",
     "description": ""
   },
-  "permissions": ["device:os.local_storage"],
+  "permissions": ["device:os.local_storage", "data:os.device.info"],
   "runtime": {
     "apiVersion": {
       "compatible": "3.6",
@@ -54,6 +54,9 @@
       "platforms": [
         {
           "st": "r"
+        },
+        {
+          "st": "s"
         }
       ],
       "designWidth": 480

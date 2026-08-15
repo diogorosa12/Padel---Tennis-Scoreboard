@@ -1,3 +1,4 @@
+import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device"
 import { px } from "@zos/utils"
 import { createWidget, widget, align, text_style, sport_data, edit_widget_group_type, prop } from '@zos/ui'
 import { localStorage } from "@zos/storage"
@@ -16,6 +17,10 @@ let originalSettings
 let moreSettingsGroup
 let menuGroup
 
+const { screenShape } = getDeviceInfo()
+
+const TOP_OFFSET = screenShape === SCREEN_SHAPE_SQUARE ? 60 + px(0) : 0
+
 DataWidget(
   BasePage({
     init(page) {
@@ -26,28 +31,28 @@ DataWidget(
       // Create display groups
       matchGroup = createWidget(widget.GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(SCREEN_HEIGHT)
       })
 
       settingsGroup = createWidget(widget.GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(SCREEN_HEIGHT)
       })
 
       moreSettingsGroup = createWidget(widget.GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(SCREEN_HEIGHT)
       })
 
       menuGroup = createWidget(widget.GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(SCREEN_HEIGHT)
       })
@@ -142,7 +147,7 @@ DataWidget(
         color: 0xffffff,
         radius: px(20),
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0x777777,
         click_func: () => {
           setSets(true)
           setsNumber.setProperty(prop.TEXT, `${getSets()}`)
@@ -159,7 +164,7 @@ DataWidget(
         color: 0xffffff,
         radius: px(20),
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0x777777,
         click_func: () => {
           setSets(false)
           setsNumber.setProperty(prop.TEXT, `${getSets()}`)
@@ -200,7 +205,7 @@ DataWidget(
         color: 0xffffff,
         radius: px(20),
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0x777777,
         click_func: () => {
           setGames(true)
           gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
@@ -217,7 +222,7 @@ DataWidget(
         color: 0xffffff,
         radius: px(20),
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0x777777,
         click_func: () => {
           setGames(false)
           gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
@@ -258,7 +263,7 @@ DataWidget(
         color: 0xffffff,
         radius: px(20),
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0x777777,
         click_func: () => {
           setTieBreak(true)
           tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
@@ -275,7 +280,7 @@ DataWidget(
         color: 0xffffff,
         radius: px(20),
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0x777777,
         click_func: () => {
           setTieBreak(false)
           tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
@@ -296,7 +301,7 @@ DataWidget(
 
       tieBreakOption = createWidget(widget.CHECKBOX_GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(64),
         select_src: 'selected.png',
@@ -335,7 +340,7 @@ DataWidget(
 
       pingPongOption = createWidget(widget.CHECKBOX_GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(64),
         select_src: 'selected.png',
@@ -388,7 +393,7 @@ DataWidget(
         w: px(100),
         h: px(54),
         text: `TABLE\nTENNIS`,
-        text_size: px(16),
+        text_size: px(18),
         color: 0x777777,
         align_h: align.LEFT,
         align_v: align.CENTER_V
@@ -396,11 +401,11 @@ DataWidget(
 
       const backButton2 = moreSettingsGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 - 60),
-        y: px(SCREEN_HEIGHT - 135),
+        y: px(SCREEN_HEIGHT - 145),
         w: px(120),
         h: px(80),
-        normal_src: 'serve.png',
-        press_src: 'undo_press.png',
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
 
         click_func: () => {
           saveSettings()
@@ -417,7 +422,7 @@ DataWidget(
         y: px(SCREEN_HEIGHT - 150),
         w: px(100),
         h: px(80),
-        normal_src: 'settings6.png',
+        normal_src: 'settings.png',
         press_src: 'settings_pressed.png',
 
         click_func: () => {
@@ -451,7 +456,7 @@ DataWidget(
       
       deuceOption = createWidget(widget.RADIO_GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
         h: px(60),
         select_src: 'selected.png',
@@ -512,7 +517,7 @@ DataWidget(
 
       serveOption = createWidget(widget.CHECKBOX_GROUP, {
         x: px(0),
-        y: px(0),
+        y: TOP_OFFSET,
         w: px(480),
         h: px(64),
         select_src: 'selected.png',
@@ -567,11 +572,11 @@ DataWidget(
 
       const backButton = settingsGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 - 60),
-        y: px(SCREEN_HEIGHT - 135),
+        y: px(SCREEN_HEIGHT - 145),
         w: px(120),
         h: px(80),
-        normal_src: 'serve.png',
-        press_src: 'undo_press.png',
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
 
         click_func: () => {
           saveSettings()
@@ -712,7 +717,7 @@ DataWidget(
         y: px(SCREEN_HEIGHT - 150),
         w: px(100),
         h: px(80),
-        normal_src: 'settings6.png',
+        normal_src: 'settings.png',
         press_src: 'settings_pressed.png',
 
         click_func: () => {
@@ -728,7 +733,7 @@ DataWidget(
         optional_types: widgetOptionalArray2,
         count: widgetOptionalArray2.length,
         x: px(SCREEN_WIDTH / 2 - 50),
-        y: px(SCREEN_HEIGHT - 62),
+        y: px(SCREEN_HEIGHT - 62) + TOP_OFFSET,
         w: px(150),
         h: px(50),
         rect_visible: false,
@@ -739,7 +744,7 @@ DataWidget(
 
       const hrImg = createWidget(widget.IMG, {
         x: px(SCREEN_WIDTH / 2 - 50),
-        y: px(SCREEN_HEIGHT - 54),
+        y: px(SCREEN_HEIGHT - 54) + TOP_OFFSET,
         src: 'heart.png'
       })
       
