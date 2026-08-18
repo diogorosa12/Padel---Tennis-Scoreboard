@@ -58,42 +58,15 @@ function saveMatchToHistory(service, match) {
     MATCH_HISTORY_KEY,
     JSON.stringify(history)
   )
-
-  log.log(
-    "Match saved. Total matches:",
-    history.length
-  )
 }
 
 
 AppSideService(
   BaseSideService({
-
-    onInit(e) {
-      log.log("Side Service started")
-    },
-
-    onRun(e) {
-      log.log("Side Service running")
-    },
-
-    onDestroy() {
-      log.log("Side Service destroyed")
-    },
-
     onRequest(req, res) {
-      log.log("Received request:", req.method)
-
       if (req.method === "MATCH_FINISHED") {
         const match = req.params.match
-
-        log.log("MATCH FINISHED")
-        log.log(JSON.stringify(match))
-
         const record = createMatchRecord(this, match)
-
-        log.log("MATCH RECORD")
-        log.log(JSON.stringify(record))
 
         saveMatchToHistory(this, record)
 

@@ -647,8 +647,8 @@ DataWidget(
               params: {
                 match: finishedMatch
               }
-            }).then((data) => {
-              page.log("Match sent:", data)
+            }).catch((error) => {
+              page.log("Could not send match:", error)
             })
           }
 
@@ -680,8 +680,8 @@ DataWidget(
               params: {
                 match: finishedMatch
               }
-            }).then((data) => {
-              page.log("Match sent:", data)
+            }).catch((error) => {
+              page.log("Could not send match:", error)
             })
           }
           saveMatch()

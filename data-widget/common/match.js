@@ -98,9 +98,6 @@ export function awardSet(winner) {
   }
   match.firstServe = match.serve
 
-  console.log('player 1', match.player1.result)
-  console.log('player 2', match.player2.result)
-
   match.player1.games = 0
   match.player2.games = 0
   resetPoints()

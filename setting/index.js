@@ -1,3 +1,5 @@
+import { styles } from "./styles"
+
 const SPORT_NAMES = {
   unknown: "Unknown",
   padel: "Padel",
@@ -35,9 +37,13 @@ function getSelectedValue(selection) {
 
 AppSettingsPage({
   build(props) {
+
+    
     const stored = props.settingsStorage.getItem("matchHistory")
     const pendingDelete = props.settingsStorage.getItem("pendingMatchDelete")
     const defaultSport = props.settingsStorage.getItem("defaultSport") || "padel"
+    const selectedMatch = props.settingsStorage.getItem("selectedMatch")    
+    
     let history = []
 
     if (stored) {
@@ -48,10 +54,12 @@ AppSettingsPage({
         console.log("Could not parse match history")
       }
     }
+  
 
     const defaultSportSelector = Section(
       {
         title: "Default sport"
+        
       },
       [
         Text(
@@ -63,6 +71,7 @@ AppSettingsPage({
         ),
         Select({
           label: "Sport for new matches",
+          color: "white",
           value: defaultSport,
           options: [
             { name: "Padel", value: "padel" },
@@ -80,15 +89,20 @@ AppSettingsPage({
     )
 
     if (history.length === 0) {
-      return Section({}, [
-        defaultSportSelector,
-        Text(
-          {
-            paragraph: true
-          },
-          "No matches saved yet."
-        )
-      ])
+      return View(
+        { style: styles.page },
+        [
+          Section({}, [
+            defaultSportSelector,
+            Text(
+              {
+                paragraph: true
+              },
+              "No matches saved yet."
+            )
+          ])
+        ]
+      )
     }
 
     const matchItems = history
@@ -96,105 +110,87 @@ AppSettingsPage({
       .reverse()
       .map((match, index) => {
         const historyIndex = history.length - 1 - index
+        const result = (match.player1.sets - match.player2.sets) > 0 ? "Win" : "Loss"
+        const resultColor = result === "Win" ? "#008cff" : "#ff3c3c"
         const date = new Date(match.startTime)
-        const duration = formatDuration(match.duration)
-        const durationText = 'Duration: ' + duration
-        const dateText = Number.isNaN(date.getTime())
-          ? "Unknown date"
-          : date.toLocaleString()
-        const player1 = match.player1 || {}
-        const player2 = match.player2 || {}
-        const sport = match.sport || "unknown"
-        const p1Games = Array.isArray(player1.games)
-          ? player1.games.join("  ")
-          : "-"
-        const p2Games = Array.isArray(player2.games)
-          ? player2.games.join("  ")
-          : "-"
-
-        return Section(
+      const dateText = Number.isNaN(date.getTime())
+        ? "Unknown date"
+        : date.toLocaleString([], {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+        return View(
           {
-            title: `Match ${history.length - index}`
+            style: styles.matchButton,
+            onClick: () => {
+              props.settingsStorage.setItem(
+                "selectedMatch",
+                String(historyIndex)
+              )
+            }
           },
           [
-            Text(
+            View(
               {
-                paragraph: true
+                style: styles.matchInfo
               },
-              dateText
-            ),
-            Text(
-              {
-                paragraph: true
-              },
-              durationText,
-            ),
-            Text(
-              {
-                paragraph: true
-              },
-              `Player 1:   ${p1Games}`
-            ),
-            Text(
-              {
-                paragraph: true
-              },
-              `Player 2:   ${p2Games}`
-            ),
-            Text(
-              {
-                paragraph: true
-              },
-              `Sets: ${player1.sets ?? 0} - ${player2.sets ?? 0}`
-              
-            ),
-            Text(
-              {
-                paragraph: true,
-                bold: true
-              },
-              `Sport: ${SPORT_NAMES[sport] || "Unknown"}`
-            ),
-            Select({
-              label: "Change sport",
-              value: sport,
-              options: [
-                { name: "Unknown", value: "unknown" },
-                { name: "Padel", value: "padel" },
-                { name: "Tennis", value: "tennis" },
-                { name: "Table Tennis", value: "tableTennis" }
-              ],
-              onChange: (selection) => {
-                const value = getSelectedValue(selection)
-
-                if (!SPORT_NAMES[value]) {
-                  return
-                }
-
-                const updatedHistory = history.slice()
-                updatedHistory[historyIndex] = {
-                  ...updatedHistory[historyIndex],
-                  sport: value
-                }
-                props.settingsStorage.setItem(
-                  "matchHistory",
-                  JSON.stringify(updatedHistory)
+              [
+                View(
+                  {
+                    style: styles.result
+                  },
+                  [
+                    Text(
+                      {
+                        bold: true,
+                        style: {
+                          ...styles.matchResult,
+                          color: resultColor
+                        }
+                      },
+                      result
+                    ),
+                    Text(
+                      {
+                        bold: true,
+                        style: styles.matchResult
+                      },
+                      `${match.player1.sets} - ${match.player2.sets}`
+                    )
+                  ]
+                ),
+                Text(
+                  {
+                    paragraph: true,
+                    style: styles.matchDate
+                  },
+                  dateText
                 )
-              }
-            }),
-            Button({
-              label: "Delete match",
-              color: "secondary",
-              style: {
-                color: "#000000"
+              ]
+            ),
+            View(
+              {
+                style: styles.matchRight
               },
-              onClick: () => {
-                props.settingsStorage.setItem(
-                  "pendingMatchDelete",
-                  String(historyIndex)
+              [
+                Text(
+                  {
+                    bold: true,
+                    style: styles.matchRightText
+                  },
+                  SPORT_NAMES[match.sport || "unknown"] || "Unknown"
+                ),
+                Text(
+                  {
+                    style: styles.matchArrow
+                  },
+                  "❯"
                 )
-              }
-            })
+              ]
+            )
           ]
         )
       })
@@ -209,11 +205,14 @@ AppSettingsPage({
       pendingIndex < history.length
 
     if (hasPendingDelete) {
-      return Section(
-        {
-          title: `Delete Match ${pendingIndex + 1}?`
-        },
+      return View(
+        { style: styles.page },
         [
+          Section(
+            {
+              title: `Delete Match ${pendingIndex + 1}?`
+            },
+            [
           Text(
             {
               paragraph: true,
@@ -248,12 +247,116 @@ AppSettingsPage({
                 JSON.stringify(updatedHistory)
               )
               props.settingsStorage.removeItem("pendingMatchDelete")
+              props.settingsStorage.removeItem("selectedMatch")
             }
-          })
+              })
+            ]
+          )
         ]
       )
     }
 
-    return Section({}, [defaultSportSelector, ...matchItems])
+    const selectedIndex = Number(selectedMatch)
+    const hasSelectedMatch =
+      selectedMatch !== null &&
+      selectedMatch !== undefined &&
+      selectedMatch !== "" &&
+      Number.isInteger(selectedIndex) &&
+      selectedIndex >= 0 &&
+      selectedIndex < history.length
+
+    if (hasSelectedMatch) {
+      const match = history[selectedIndex]
+      const durationText = `Duration: ${formatDuration(match.duration)}`
+      const date = new Date(match.startTime)
+      const dateText = Number.isNaN(date.getTime())
+        ? "Unknown date"
+        : date.toLocaleString()
+      const player1 = match.player1 || {}
+      const player2 = match.player2 || {}
+      const sport = match.sport || "unknown"
+      const p1Games = Array.isArray(player1.games)
+        ? player1.games.join("  ")
+        : "-"
+      const p2Games = Array.isArray(player2.games)
+        ? player2.games.join("  ")
+        : "-"
+
+      return View(
+        { style: styles.page },
+        [
+          Section(
+            {
+              title: `Match ${selectedIndex + 1}`
+            },
+            [
+          Text({ paragraph: true }, dateText),
+          Text({ paragraph: true }, durationText),
+          Text({ paragraph: true }, `Player 1:   ${p1Games}`),
+          Text({ paragraph: true }, `Player 2:   ${p2Games}`),
+          Text(
+            { paragraph: true },
+            `Sets: ${player1.sets ?? 0} - ${player2.sets ?? 0}`
+          ),
+          Text(
+            {
+              paragraph: true,
+              bold: true
+            },
+            `Sport: ${SPORT_NAMES[sport] || "Unknown"}`
+          ),
+          Select({
+            label: "Change sport",
+            value: sport,
+            options: [
+              { name: "Unknown", value: "unknown" },
+              { name: "Padel", value: "padel" },
+              { name: "Tennis", value: "tennis" },
+              { name: "Table Tennis", value: "tableTennis" }
+            ],
+            onChange: (selection) => {
+              const value = getSelectedValue(selection)
+
+              if (!SPORT_NAMES[value]) {
+                return
+              }
+
+              const updatedHistory = history.slice()
+              updatedHistory[selectedIndex] = {
+                ...updatedHistory[selectedIndex],
+                sport: value
+              }
+              props.settingsStorage.setItem(
+                "matchHistory",
+                JSON.stringify(updatedHistory)
+              )
+            }
+          }),
+          Button({
+            label: "Delete match",
+            color: "secondary",
+            style: {
+              color: "#000000"
+            },
+            onClick: () => {
+              props.settingsStorage.setItem(
+                "pendingMatchDelete",
+                String(selectedIndex)
+              )
+            }
+          }),
+          Button({
+            label: "Back",
+            onClick: () => {
+              props.settingsStorage.removeItem("selectedMatch")
+            }
+              })
+            ]
+          )
+        ]
+      )
+    }
+
+    return View({style: styles.page}, [defaultSportSelector, ...matchItems])
   }
 })
