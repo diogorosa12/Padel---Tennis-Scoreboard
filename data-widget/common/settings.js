@@ -9,16 +9,37 @@ let settings = {
   games: 6,
   tieBreak: 7,
   tieBreakMode: false,
-  pingPong: false
+  sport: "padel",
+  normalPoints: false,
+  doubles: true
 }
 
 
+export function updateSettings(newSettings) {
+  console.log("old", JSON.stringify(settings))
+  Object.assign(settings, newSettings)
+  if (newSettings.sport === "padel" || newSettings.sport === "tennis"){
+    settings.normalPoints = false
+    //settings.tieBreak = 7
+  }
+  if (newSettings.sport === "tableTennis" || newSettings.sport === "pickleball" || newSettings.sport === "squash" || newSettings.sport === "badminton"){
+    settings.normalPoints = true
+    settings.tieBreakMode = false    
+    //settings.games = 1
+  }
+  if (newSettings.sport === "pickleball"){
+  }
+  if (newSettings.sport === "squash"){
+  }
+  if (newSettings.sport === "badminton"){
+  }
+  console.log("NEW", JSON.stringify(settings))
+}
 export function getTieBreak() {
   return settings.tieBreak
 }
 export function setTieBreak(signal) {
-  if(signal === true && settings.tieBreak < 21){
-
+  if(signal === true && settings.tieBreak < 50){
     settings.tieBreak++
   }
   else if(signal === false && settings.tieBreak > 1){
@@ -33,7 +54,7 @@ export function getSets() {
   return settings.bestOf
 }
 export function setSets(signal) {
-    if(signal === true && settings.bestOf < 11){
+    if(signal === true && settings.bestOf < 15){
 
     settings.bestOf = settings.bestOf + 2
   }
@@ -46,7 +67,7 @@ export function getGames() {
   return settings.games
 }
 export function setGames(signal) {
-  if(signal === true && settings.games < 11){
+  if(signal === true && settings.games < 20){
     settings.games++
   }
   else if(signal === false && settings.games > 1){
@@ -62,6 +83,9 @@ export function setFirstServe(value){
 }
 export function setDeuce(value){
   settings.deuce = value
+}
+export function setSport(value){
+  settings.sport = value
 }
 export function getSettings() {
   return settings

@@ -18,7 +18,7 @@ function createMatchRecord(service, match) {
     startTime: match.timestamp,
     duration: Date.now() - match.timestamp,
     
-    sport: match.pingPong === true ? "tableTennis" : getDefaultSport(service),
+    sport: match.sport,
 
     player1: {
       sets: match.player1.sets,

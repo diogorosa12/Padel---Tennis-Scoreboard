@@ -2,7 +2,7 @@ import { getSettings } from "./settings"
 
 let history = []
 
-export function createNewMatch(firstServe = true, deuce = 0) {
+export function createNewMatch(firstServe = true, deuce = 0, sport = "padel") {
   return {
     timestamp: Date.now(),
     player1: {
@@ -22,17 +22,21 @@ export function createNewMatch(firstServe = true, deuce = 0) {
     serve: firstServe,
     tieBreak: false,
     firstServe: firstServe,
-    deuce: deuce
+    deuce: deuce,
+    sport: sport
   }
 }
 
 let match = createNewMatch()
 
+export function updateMatch() {
+  match.sport = getSettings().sport  
+}
 export function setMatch(newMatch) {
-    match = newMatch
+  match = newMatch
 }
 export function getMatch() {
-    return match
+  return match
 }
 export function changeServe(){
   if(match.serve){
@@ -108,13 +112,13 @@ export function deuce(){
 }
 export function resetMatch() {
   const settings = getSettings()
-  match = createNewMatch(settings.firstServe, settings.deuce)
+  match = createNewMatch(settings.firstServe, settings.deuce, settings.sport)
 }
 export function undoHelper() {
 
   const diff = match.player1.pointIndex - match.player2.pointIndex
   
-  if (match.player1.pointIndex >= 3 && match.player2.pointIndex >= 3 && getSettings().pingPong === false){
+  if (match.player1.pointIndex >= 3 && match.player2.pointIndex >= 3 && getSettings().normalPoints === false/* getSettings().pingPong === false */){
     if(getSettings().deuce === 0){
       if(diff === 0 && (match.player1.pointIndex === 3 || match.player1.pointIndex === 4)){
         deuce()
@@ -149,20 +153,48 @@ export function undoHelper() {
 }
 
 
-export function pingPongMode(winner, loser, diffPoints, deuce = false) {
-  // Change serves in Ping-Pong
-  if(deuce === false && (winner.pointIndex + loser.pointIndex)%2 === 0){
-    changeServe()
+export function pingPongMode(winner, loser, diffPoints, deuce = false, sport) {
+  // Change serves in Table Tennis
+  if (sport === "tableTennis"){
+    
+    if(deuce === false && (winner.pointIndex + loser.pointIndex)%2 === 0){
+      changeServe()
+    }
+    if(deuce === true){
+      changeServe()
+    }
+    // Award game to player
+    if(winner.pointIndex >= getSettings().tieBreak && diffPoints >= 2){
+  
+      saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
+  
+      awardSet(winner)
+    }
   }
-  if(deuce === true){
-    changeServe()
+  // Squash and Badminton
+  if (sport === "squash" || sport === "badminton"){
+    // Award game to player 
+    if ((winner.pointIndex >= getSettings().tieBreak && diffPoints >= 2)) {
+      saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
+      awardSet(winner)
+    }
+    if (sport === "badminton" && winner.pointIndex === 30){
+      saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
+      awardSet(winner)
+    }
+    if((match.serve === true && winner === match.player2) || (match.serve === false && winner === match.player1)){
+      changeServe()
+    }
   }
-  // Award game to player
-  if(winner.pointIndex >= getSettings().tieBreak && diffPoints >= 2){
-
-    saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
-
-    awardSet(winner)
+  if (sport === "pickleball"){
+    if ((match.serve === true && winner === match.player2) || (match.serve === false && winner === match.player1)){
+      winner.pointIndex--
+      changeServe()
+    }
+    if (winner.pointIndex >= getSettings().tieBreak && diffPoints >= 2){
+      awardSet(winner)
+      changeServe()
+    }
   }
 }
 
@@ -176,18 +208,30 @@ export function playerWonPoint(player) {
   // Increment winner point index
   winner.pointIndex++
   const diffPoints = Math.abs(winner.pointIndex - loser.pointIndex)
+  const diffSets = Math.abs(winner.sets - loser.sets)
+
+
+
+  // Super Tiebreak
+  const superTieBreak = (settings.tieBreakMode && diffSets === 0 && winner.sets === settings.bestOf/2 - 0.5) ? true : false
+  const tieBreakPoints = superTieBreak ? 10 : 7
   
+  if(superTieBreak){
+    match.tieBreak = true
+  }
+
   // Tiebreak
   if(match.tieBreak === true){
+    
     // Change serves in tiebreak
     if((winner.pointIndex + loser.pointIndex)%2 != 0){
       changeServe()
     }
     // Award set to player
-    if(winner.pointIndex >= settings.tieBreak && diffPoints >= 2){
+    if(winner.pointIndex >= tieBreakPoints && diffPoints >= 2){
       winner.games++
       
-      if(settings.tieBreakMode && Math.abs(winner.sets - loser.sets) === 0 && winner.sets === settings.bestOf/2 + 0.5 - 1) {
+      if(settings.tieBreakMode && Math.abs(winner.sets - loser.sets) === 0 && winner.sets === settings.bestOf/2 - 0.5) {
         saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
       }
       else{
@@ -195,15 +239,16 @@ export function playerWonPoint(player) {
       }
     
       awardSet(winner)
+      //settings.tieBreak = 7
     }
   }
   else{ 
-    // Ping-Pong
-    if(settings.pingPong === true){
+    // Normal Points
+    if(settings.sport !== "padel" && settings.sport !== "tennis"/* settings.pingPong === true */){
       if((winner.pointIndex + loser.pointIndex) >= settings.tieBreak * 2 - 2){
         deuceFlag = true
       }
-      pingPongMode(winner, loser, diffPoints, deuceFlag)
+      pingPongMode(winner, loser, diffPoints, deuceFlag, settings.sport)
     }
     // Normal game
     else{
@@ -256,20 +301,21 @@ export function playerWonPoint(player) {
       saveSetScore(match.player1.games, match.player2.games)
       awardSet(winner)
     }     
-
-    const diffSets = Math.abs(winner.sets - loser.sets)
-    // Last set TieBreak mode
-    if(settings.tieBreakMode){
-      if(diffSets === 0 && winner.sets === settings.bestOf/2 + 0.5 - 1) {
-        match.tieBreak = true
-      }
-    }
+    /////
   }
+  /* const diffSets = Math.abs(winner.sets - loser.sets)
+  // Last set TieBreak mode
+  if(settings.tieBreakMode){
+    if(diffSets === 0 && winner.sets === settings.bestOf/2 + 0.5 - 1) {
+      match.tieBreak = true
+      //settings.tieBreak = 10
+    }
+  } */
   
   // Win match
   if (winner.sets >= settings.bestOf/2 + 0.5){
     const finishedMatch = JSON.parse(JSON.stringify(match))
-    finishedMatch.pingPong = settings.pingPong
+    //finishedMatch.pingPong = settings.pingPong
     
     resetMatch()
 

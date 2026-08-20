@@ -6,16 +6,37 @@ import { undoHelper, getMatch, getServer, resetMatch, playerWonPoint, saveState,
 import { POINTS, PLAYER_1, PLAYER_2, SCREEN_WIDTH, SCREEN_HEIGHT } from './constants'
 import { saveMatch, loadMatch } from './storage'
 import { getPointText } from './helpers'
-import {getSettings, loadSettings, saveSettings, setFirstServe, setDeuce, setSets, getSets, getGames, setGames, getTieBreak, setTieBreak } from "./settings"
+import { updateSettings, getSettings, loadSettings, saveSettings, setFirstServe, setDeuce, setSport, setSets, getSets, getGames, setGames, getTieBreak, setTieBreak } from "./settings"
 import { BasePage } from "@zeppos/zml/base-page";
 
 let matchGroup
 let settingsGroup
 let deuceOption
 let serveOption
+let sportOption
 let originalSettings
 let moreSettingsGroup
 let menuGroup
+let settingsPageGroup
+let sportsPageGroup
+let tieBreakGroup
+let gamesGroup
+let newGameFlag = false
+let menuFlag = false
+let newGameSettings
+let settingsPage = 1
+let backAndAcceptGroup
+/* let newGameSettings = {
+  sport: getSettings().sport,
+  firstServe: getSettings().firstServe,
+  deuce: getSettings().deuce,
+  bestOf: getSettings().bestOf,
+  games: getSettings().games,
+  tieBreak: getSettings().tieBreak,
+  tieBreakMode: getSettings().tieBreakMode,
+} */
+
+
 
 const { screenShape } = getDeviceInfo()
 
@@ -28,6 +49,187 @@ DataWidget(
       loadMatch()
       loadSettings()
 
+
+      function updateMoreSettingsUI() {
+
+        const setting = newGameFlag === true ? newGameSettings : getSettings()
+        //const setting = newGameSettings
+
+        if(setting.sport === "padel" || setting.sport === "tennis") {
+          /* setting.tieBreak = 7
+          setting.games = 6 */
+          gamesNumber.setProperty(prop.TEXT, `${setting.games}`)
+          tieBreakGroup.setProperty(prop.VISIBLE, false)
+          superTieBreakText.setProperty(prop.VISIBLE, true)
+          superTieBreakOption.setProperty(prop.VISIBLE, true)
+          gamesGroup.setProperty(prop.VISIBLE, true)
+        }
+        if(setting.sport === "tableTennis" || setting.sport === "pickleball" || setting.sport === "squash" || setting.sport === "badminton") {
+          //setting.tieBreak = 11
+          tieBreakText.setProperty(prop.VISIBLE, true)
+          tieBreakText.setProperty(prop.TEXT, "POINTS")
+          tieBreakGroup.setProperty(prop.VISIBLE, true)
+          superTieBreakText.setProperty(prop.VISIBLE, false)
+          superTieBreakOption.setProperty(prop.VISIBLE, false)
+          gamesGroup.setProperty(prop.VISIBLE, false)
+        }
+        /* if(setting.sport === "pickleball") {
+          //setting.tieBreak = 11
+          tieBreakText.setProperty(prop.VISIBLE, true)
+          tieBreakText.setProperty(prop.TEXT, "POINTS")
+          tieBreakGroup.setProperty(prop.VISIBLE, true)
+          superTieBreakText.setProperty(prop.VISIBLE, false)
+        }
+        if(setting.sport === "squash") {
+          //setting.tieBreak = 11
+          tieBreakText.setProperty(prop.VISIBLE, true)
+          tieBreakText.setProperty(prop.TEXT, "POINTS")
+          tieBreakGroup.setProperty(prop.VISIBLE, true)
+          superTieBreakText.setProperty(prop.VISIBLE, false)
+        }
+        if(setting.sport === "badminton") {
+          //setting.tieBreak = 21
+          tieBreakText.setProperty(prop.VISIBLE, true)
+          tieBreakText.setProperty(prop.TEXT, "POINTS")
+          tieBreakGroup.setProperty(prop.VISIBLE, true)
+          superTieBreakText.setProperty(prop.VISIBLE, false)
+        } */
+      }
+     
+      function updateSettingsUI() {
+
+        const setting = newGameFlag === true ? newGameSettings : getSettings()
+        
+        deuceOption.setProperty(prop.CHECKED, buttons[setting.deuce])
+      
+      }
+
+      function resetSport() {
+        padelButton.setProperty(prop.MORE, {
+          x: px(SCREEN_WIDTH / 2 - 215),
+          y: px(140),
+          w: px(210),
+          h: px(55),
+          normal_color: 0x252525,
+          press_color: 0x252525,
+        })
+
+        tennisButton.setProperty(prop.MORE, {
+          x: px(SCREEN_WIDTH / 2 + 5),
+          y: px(140),
+          w: px(210),
+          h: px(55),
+          normal_color: 0x252525,
+          press_color: 0x252525,
+        })
+
+        tableTennisButton.setProperty(prop.MORE, {
+          x: px(SCREEN_WIDTH / 2 - 215),
+          y: px(205),
+          w: px(210),
+          h: px(55),
+          normal_color: 0x252525,
+          press_color: 0x252525,
+        })
+
+        pickleballButton.setProperty(prop.MORE, {
+          x: px(SCREEN_WIDTH / 2 + 5),
+          y: px(205),
+          w: px(210),
+          h: px(55),
+          normal_color: 0x252525,
+          press_color: 0x252525,
+        })
+
+        squashButton.setProperty(prop.MORE, {
+          x: px(SCREEN_WIDTH / 2 - 215),
+          y: px(270),
+          w: px(210),
+          h: px(55),
+          normal_color: 0x252525,
+          press_color: 0x252525,
+        })
+
+        badmintonButton.setProperty(prop.MORE, {
+          x: px(SCREEN_WIDTH / 2 + 5),
+          y: px(270),
+          w: px(210),
+          h: px(55),
+          normal_color: 0x252525,
+          press_color: 0x252525,
+        })
+      }     
+
+      function colorSport() {
+        if (newGameSettings.sport === "padel") {
+          console.log("padel")
+          padelButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 - 215),
+            y: px(140),
+            w: px(210),
+            h: px(55),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+        }
+        if (newGameSettings.sport === "tennis") {
+          console.log("tennis")
+          tennisButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 + 5),
+            y: px(140),
+            w: px(210),
+            h: px(55),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+        }
+        if (newGameSettings.sport === "tableTennis") {
+          console.log("tableTennis")
+          tableTennisButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 - 215),
+            y: px(205),
+            w: px(210),
+            h: px(55),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+        }
+        if (newGameSettings.sport === "pickleball") {
+          console.log("pickleball")
+          pickleballButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 + 5),
+            y: px(205),
+            w: px(210),
+            h: px(55),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+        }
+        if (newGameSettings.sport === "squash") {
+          console.log("squash")
+          squashButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 - 215),
+            y: px(270),
+            w: px(210),
+            h: px(55),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+        }
+        if (newGameSettings.sport === "badminton") {
+          console.log("badminton")
+          badmintonButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 + 5),
+            y: px(270),
+            w: px(210),
+            h: px(55),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+          
+        }
+      }
+        
       // Create display groups
       matchGroup = createWidget(widget.GROUP, {
         x: px(0),
@@ -57,37 +259,80 @@ DataWidget(
         h: px(SCREEN_HEIGHT)
       })
 
+      settingsPageGroup = createWidget(widget.GROUP, {
+        x: px(0),
+        y: TOP_OFFSET,
+        w: px(SCREEN_WIDTH),
+        h: px(SCREEN_HEIGHT)
+      })
+
+      sportsPageGroup = createWidget(widget.GROUP, {
+        x: px(0),
+        y: TOP_OFFSET,
+        w: px(SCREEN_WIDTH),
+        h: px(SCREEN_HEIGHT)
+      })
+      backAndAcceptGroup = createWidget(widget.GROUP, {
+        x: px(0),
+        y: TOP_OFFSET,
+        w: px(SCREEN_WIDTH),
+        h: px(SCREEN_HEIGHT)
+      })
+      tieBreakGroup = createWidget(widget.GROUP, {
+        x: px(0),
+        y: px(0) + TOP_OFFSET,
+        w: px(SCREEN_WIDTH),
+        h: px(SCREEN_HEIGHT)
+      })
+      gamesGroup = createWidget(widget.GROUP, {
+        x: px(0),
+        y: px(0) + TOP_OFFSET,
+        w: px(SCREEN_WIDTH),
+        h: px(SCREEN_HEIGHT)
+      })
+
+
       function showMenu() {
+        settingsPageGroup.setProperty(prop.VISIBLE, false)
         menuGroup.setProperty(prop.VISIBLE, true)
         matchGroup.setProperty(prop.VISIBLE, false)
         settingsGroup.setProperty(prop.VISIBLE, false)
         deuceOption.setProperty(prop.VISIBLE, false)
         serveOption.setProperty(prop.VISIBLE, false)
         moreSettingsGroup.setProperty(prop.VISIBLE, false)
-        tieBreakOption.setProperty(prop.VISIBLE, false)
-        pingPongOption.setProperty(prop.VISIBLE, false)
+        //tieBreakOption.setProperty(prop.VISIBLE, false)
+        sportsPageGroup.setProperty(prop.VISIBLE, false)
+        backAndAcceptGroup.setProperty(prop.VISIBLE, false)
+        tieBreakGroup.setProperty(prop.VISIBLE, false)
+        superTieBreakOption.setProperty(prop.VISIBLE, false)
+        settingsBackButton.setProperty(prop.VISIBLE, false)
+        gamesGroup.setProperty(prop.VISIBLE, false)
       }
 
       function showMatch() {
+        settingsPageGroup.setProperty(prop.VISIBLE, false)
         menuGroup.setProperty(prop.VISIBLE, false)
         matchGroup.setProperty(prop.VISIBLE, true)
         settingsGroup.setProperty(prop.VISIBLE, false)
         deuceOption.setProperty(prop.VISIBLE, false)
         serveOption.setProperty(prop.VISIBLE, false)
         moreSettingsGroup.setProperty(prop.VISIBLE, false)
-        tieBreakOption.setProperty(prop.VISIBLE, false)
-        pingPongOption.setProperty(prop.VISIBLE, false)
+        //tieBreakOption.setProperty(prop.VISIBLE, false)
+        sportsPageGroup.setProperty(prop.VISIBLE, false)
+        backAndAcceptGroup.setProperty(prop.VISIBLE, false)
+        tieBreakGroup.setProperty(prop.VISIBLE, false)
+        superTieBreakOption.setProperty(prop.VISIBLE, false)
+        settingsBackButton.setProperty(prop.VISIBLE, false)
+        gamesGroup.setProperty(prop.VISIBLE, false)
         undoHelper()
         saveMatch()
         refreshUI()
       }
 
-      function showSettings(flag = false) {
+      function showSettings() {
         
-        if(!flag){
-          originalSettings = JSON.parse(JSON.stringify(getSettings()))
-          saveMatch()
-        }
+        updateSettingsUI()
+        settingsPageGroup.setProperty(prop.VISIBLE, false)
         menuGroup.setProperty(prop.VISIBLE, false)
         matchGroup.setProperty(prop.VISIBLE, false)
         settingsGroup.setProperty(prop.VISIBLE, true)
@@ -95,24 +340,513 @@ DataWidget(
         serveOption.setProperty(prop.VISIBLE, true)
         moreSettingsGroup.setProperty(prop.VISIBLE, false)
         moreSettingsGroup.setProperty(prop.VISIBLE, false)
-        tieBreakOption.setProperty(prop.VISIBLE, false)
-        pingPongOption.setProperty(prop.VISIBLE, false)
+        //tieBreakOption.setProperty(prop.VISIBLE, false)
+        sportsPageGroup.setProperty(prop.VISIBLE, false)
+        tieBreakGroup.setProperty(prop.VISIBLE, false)
+        superTieBreakOption.setProperty(prop.VISIBLE, false)
+        gamesGroup.setProperty(prop.VISIBLE, false)
+        /* if (newGameFlag) {
+          backButton.setProperty(prop.VISIBLE, false)
+        }
+        else {
+          backButton.setProperty(prop.VISIBLE, true)
+        } */
       }
 
       function showMoreSettings() {
+        updateMoreSettingsUI()
 
+        settingsPageGroup.setProperty(prop.VISIBLE, false)
         settingsGroup.setProperty(prop.VISIBLE, false)
         deuceOption.setProperty(prop.VISIBLE, false)
         serveOption.setProperty(prop.VISIBLE, false)
         moreSettingsGroup.setProperty(prop.VISIBLE, true)
-        if(getSettings().pingPong === false){
-          tieBreakOption.setProperty(prop.VISIBLE, true)
-          tieBreakTypes.setProperty(prop.VISIBLE, true)
+        sportsPageGroup.setProperty(prop.VISIBLE, false)
+        
+        /* if (newGameFlag) {
+          backButton2.setProperty(prop.VISIBLE, false)
         }
-        pingPongOption.setProperty(prop.VISIBLE, true)
+        else {
+          backButton2.setProperty(prop.VISIBLE, true)
+        } */
+      }
+
+      function showSettingsPage(flag = false) {
+        if(!flag){
+          originalSettings = JSON.parse(JSON.stringify(getSettings()))
+          saveMatch()
+        }
+
+        settingsPageGroup.setProperty(prop.VISIBLE, true)
+        menuGroup.setProperty(prop.VISIBLE, false)
+        matchGroup.setProperty(prop.VISIBLE, false)
+        settingsGroup.setProperty(prop.VISIBLE, false)
+        deuceOption.setProperty(prop.VISIBLE, false)
+        serveOption.setProperty(prop.VISIBLE, false)
+        moreSettingsGroup.setProperty(prop.VISIBLE, false)
+        //tieBreakOption.setProperty(prop.VISIBLE, false)
+        sportsPageGroup.setProperty(prop.VISIBLE, false)
+        tieBreakGroup.setProperty(prop.VISIBLE, false)
+        superTieBreakOption.setProperty(prop.VISIBLE, false)
+        settingsBackButton.setProperty(prop.VISIBLE, true)
+        gamesGroup.setProperty(prop.VISIBLE, false)
+      }
+
+      function showSportsPage() {
+
+        resetSport()
+        colorSport()
+        backAndAcceptGroup.setProperty(prop.VISIBLE, true)
+        sportsPageGroup.setProperty(prop.VISIBLE, true)
+        settingsPageGroup.setProperty(prop.VISIBLE, false)
+        menuGroup.setProperty(prop.VISIBLE, false)
+        matchGroup.setProperty(prop.VISIBLE, false)
+        settingsGroup.setProperty(prop.VISIBLE, false)
+        deuceOption.setProperty(prop.VISIBLE, false)
+        serveOption.setProperty(prop.VISIBLE, false)
+        moreSettingsGroup.setProperty(prop.VISIBLE, false)
+        //tieBreakOption.setProperty(prop.VISIBLE, false)        
+        tieBreakGroup.setProperty(prop.VISIBLE, false)
+        superTieBreakOption.setProperty(prop.VISIBLE, false)
       }
       
+      // SPORTS PAGE
+
+      const padelButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 205),
+        y: px(140),
+        w: px(200),
+        h: px(50),
+        text: `PADEL`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,
+        click_func: () => {
+
+          newGameSettings.sport = "padel"
+          resetSport()
+          colorSport()          
+
+        }
+      })   
+
+      const tennisButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 5),
+        y: px(140),
+        w: px(200),
+        h: px(50),
+        text: `TENNIS`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,        
+        click_func: () => {
+
+          newGameSettings.sport = "tennis"
+          resetSport()
+          colorSport()
+
+        }
+      }) 
+      
+      const tableTennisButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 205),
+        y: px(200),
+        w: px(200),
+        h: px(50),
+        text: `TABLE TENNIS`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,    
+        click_func: () => {
+
+          newGameSettings.sport = "tableTennis"
+          resetSport()
+          colorSport()
+   
+        }
+      })
+
+      const pickleballButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 5),
+        y: px(200),
+        w: px(200),
+        h: px(50),
+        text: `PICKLEBALL`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,        
+        click_func: () => {
+
+          newGameSettings.sport = "pickleball"
+          resetSport()
+          colorSport()
+
+        }
+      })
+
+      const squashButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 205),
+        y: px(260),
+        w: px(200),
+        h: px(50),
+        text: `SQUASH`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,        
+        click_func: () => {
+
+          newGameSettings.sport = "squash"
+          resetSport()
+          colorSport()
+
+        }
+      })
+
+      const badmintonButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 5),
+        y: px(260),
+        w: px(200),
+        h: px(50),
+        text: `BADMINTON`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,        
+        click_func: () => {
+
+          newGameSettings.sport = "badminton"
+          resetSport()
+          colorSport()
+
+        }
+      })
+
+      /* const otherButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 5),
+        y: px(260),
+        w: px(200),
+        h: px(50),
+        text: `OTHER`,
+        text_size: px(22),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,        
+        click_func: () => {
+
+          setSport("other")
+
+          padelButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 - 205),
+            y: px(140),
+            w: px(200),
+            h: px(50),
+            normal_color: 0x252525,
+            press_color: 0x05480d,
+          })
+
+          tennisButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 + 5),
+            y: px(140),
+            w: px(200),
+            h: px(50),
+            normal_color: 0x252525,
+            press_color: 0x05480d,
+          })
+
+          tableTennisButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 - 205),
+            y: px(200),
+            w: px(200),
+            h: px(50),
+            normal_color: 0x252525,
+            press_color: 0x05480d,
+          })
+
+          pickleballButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 + 5),
+            y: px(200),
+            w: px(200),
+            h: px(50),
+            normal_color: 0x252525,
+            press_color: 0x05480d,
+          })
+
+          squashButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 - 205),
+            y: px(260),
+            w: px(200),
+            h: px(50),
+            normal_color: 0x252525,
+            press_color: 0x05480d,
+          })
+
+          otherButton.setProperty(prop.MORE, {
+            x: px(SCREEN_WIDTH / 2 + 5),
+            y: px(260),
+            w: px(200),
+            h: px(50),
+            normal_color: 0x05480d,
+            press_color: 0x05480d,
+          })
+        }
+      }) */
+
+
+      /* const sportsBackButton = sportsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 60),
+        y: px(SCREEN_HEIGHT - 145),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          updateSettings()
+          saveSettings()
+          
+          showSettingsPage(true)
+        }
+      }) */
+
+      const sportsBackButton = backAndAcceptGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 155),
+        y: px(SCREEN_HEIGHT - 135),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          if(settingsPage === 1) {
+            showMenu()
+            newGameFlag = false
+            settingsPage = 1
+            if (getSettings().firstServe){
+              serveOption.setProperty(prop.CHECKED, true)
+            }
+            else{
+              serveOption.setProperty(prop.CHECKED, false)
+            }
+            if (getSettings().tieBreakMode){
+              superTieBreakOption.setProperty(prop.CHECKED, true)
+            }
+            else{
+              superTieBreakOption.setProperty(prop.CHECKED, false)
+            }
+            
+          }
+          if(settingsPage === 2) {
+            settingsPage--
+            showSportsPage()
+          }
+          if(settingsPage === 3) {
+            settingsPage--
+            showSettings()
+            
+          }
+        }
+      })
+
+      const acceptSport = backAndAcceptGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 35),
+        y: px(SCREEN_HEIGHT - 135),
+        w: px(120),
+        h: px(80),
+        normal_src: 'check.png',
+        press_src: 'Imagem4.png',
+
+        click_func: () => {
+          if(settingsPage === 1) {
+            showSettings()
+          }
+          if(settingsPage === 2) {
+            showMoreSettings()
+          }
+          if(settingsPage === 3) {
+            updateSettings(newGameSettings)
+            saveSettings()
+            
+            resetMatch()
+            saveMatch()
+            
+            refreshUI()
+            showMatch()
+            newGameFlag = false
+            settingsPage = 0
+          }
+          settingsPage++
+        }
+      })
+
+
+      // SETTINGS PAGE 
+
+      /* const settingsTitle = settingsPageGroup.createWidget(widget.TEXT, {
+        x: px(0),
+        y: px(35),
+        w: px(SCREEN_WIDTH),
+        h: px(170),
+        text: `SETTINGS`,
+        text_size: px(40),
+        color: 0xffffff,
+        align_h: align.CENTER_H,
+        align_v: align.CENTER_V
+      }) */
+
+      const deuceSettingsButton = settingsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(130),
+        w: px(280),
+        h: px(50),
+        text: `DEUCE/SERVE`,
+        text_size: px(30),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0X444444,
+        color: 0xffffff,
+        click_func: () => {
+          settingsPage = 2
+          showSettings()
+        }
+      })   
+
+      const pointsSettingsButton = settingsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(200),
+        w: px(280),
+        h: px(50),
+        text: `POINTS`,
+        text_size: px(30),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0X444444,
+        color: 0xffffff,
+        click_func: () => {
+          settingsPage = 3
+          showMoreSettings()
+        }
+      }) 
+      
+      /* const sportSettingsButton = settingsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(270),
+        w: px(280),
+        h: px(50),
+        text: `SPORTS`,
+        text_size: px(30),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0X444444,
+        color: 0xffffff, 
+        click_func: () => {
+          showSportsPage()
+        }
+      }) */
+
+      const settingsBackButton = createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 60),
+        y: px(SCREEN_HEIGHT - 145),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          if (settingsPage === 1) {
+
+            if (originalSettings.firstServe != getSettings().firstServe /* || originalSettings.pingPong != getSettings().pingPong */) {
+              resetMatch()
+              saveMatch()
+            }
+  
+            if(menuFlag){
+              showMenu()
+              menuFlag = false
+            }
+            else{
+              refreshUI()
+              showMatch()
+            }
+          }
+          //DEUCE SETTINGS
+          if (settingsPage === 2) {
+            saveSettings()            
+            showSettingsPage(true)
+            settingsPage = 1
+          }
+          //POINTS SETTINGS
+          if (settingsPage === 3) {
+            saveSettings()
+            showSettingsPage(true)
+            settingsPage = 1
+          }
+        }
+      })
+
+      /* const sendMatch = settingsPageGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(380),
+        w: px(280),
+        h: px(50),
+        text: `SEND MATCH`,
+        text_size: px(30),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0x05480d,
+        color: 0xffffff,        
+        click_func: () => {
+        }
+      }) */
+
       // MORE SETTINGS SCREEN
+
+      /* const pointsBackButton = moreSettingsGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 160),
+        y: px(SCREEN_HEIGHT - 145),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          showSettings()
+        }
+      }) */
+
+      /* const acceptPointsButton = moreSettingsGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 60),
+        y: px(SCREEN_HEIGHT - 145),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          updateSettings(newGameSettings)
+          saveSettings()
+          
+          resetMatch()
+          saveMatch()
+          
+          refreshUI()
+          showMatch()
+          newGameFlag = false
+        }
+      }) */
+
+
       const setsText = moreSettingsGroup.createWidget(widget.TEXT, {
         x: px(60),
         y: px(35),
@@ -126,9 +860,9 @@ DataWidget(
       })
 
       const setsNumber = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: px(SCREEN_WIDTH * 5 / 8 - 10),
+        x: px(SCREEN_WIDTH * 5 / 8 - 12),
         y: px(95),
-        w: px(50),
+        w: px(60),
         h: px(50),
         text: `${getSets()}`,
         text_size: px(50),
@@ -149,8 +883,15 @@ DataWidget(
         normal_color: 0x000000,
         press_color: 0x777777,
         click_func: () => {
-          setSets(true)
-          setsNumber.setProperty(prop.TEXT, `${getSets()}`)
+          if (newGameFlag && newGameSettings.bestOf < 15) {
+            newGameSettings.bestOf += 2
+            setsNumber.setProperty(prop.TEXT, `${newGameSettings.bestOf}`)
+          }
+          if (!newGameFlag){
+            setSets(true)
+            setsNumber.setProperty(prop.TEXT, `${getSets()}`)
+          }
+          
         }
       })
 
@@ -166,12 +907,19 @@ DataWidget(
         normal_color: 0x000000,
         press_color: 0x777777,
         click_func: () => {
-          setSets(false)
-          setsNumber.setProperty(prop.TEXT, `${getSets()}`)
+
+          if (newGameFlag && newGameSettings.bestOf > 1) {
+            newGameSettings.bestOf -= 2
+            setsNumber.setProperty(prop.TEXT, `${newGameSettings.bestOf}`)
+          }
+          if (!newGameFlag){
+            setSets(false)
+            setsNumber.setProperty(prop.TEXT, `${getSets()}`)
+          }
         }
       })
 
-      const gamesText = moreSettingsGroup.createWidget(widget.TEXT, {
+      const gamesText = gamesGroup.createWidget(widget.TEXT, {
         x: px(15),
         y: px(115),
         w: px(200),
@@ -183,7 +931,7 @@ DataWidget(
         align_v: align.CENTER_V
       })
 
-      const gamesNumber = moreSettingsGroup.createWidget(widget.TEXT, {
+      const gamesNumber = gamesGroup.createWidget(widget.TEXT, {
         x: px(SCREEN_WIDTH * 5 / 8 - 15),
         y: px(175),
         w: px(60),
@@ -195,7 +943,7 @@ DataWidget(
         align_v: align.CENTER_V
       })
 
-      const plusGamesButton = moreSettingsGroup.createWidget(widget.BUTTON, {
+      const plusGamesButton = gamesGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH * 3 / 4 + 5),
         y: px(165),
         w: px(80),
@@ -207,12 +955,18 @@ DataWidget(
         normal_color: 0x000000,
         press_color: 0x777777,
         click_func: () => {
-          setGames(true)
-          gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
+          if (newGameFlag && newGameSettings.games < 20) {
+            newGameSettings.games++
+            gamesNumber.setProperty(prop.TEXT, `${newGameSettings.games}`)
+          }
+          if (!newGameFlag){
+            setGames(true)
+            gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
+          }
         }
       })
 
-      const minusGamesButton = moreSettingsGroup.createWidget(widget.BUTTON, {
+      const minusGamesButton = gamesGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 - 45),
         y: px(160),
         w: px(80),
@@ -224,26 +978,73 @@ DataWidget(
         normal_color: 0x000000,
         press_color: 0x777777,
         click_func: () => {
-          setGames(false)
-          gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
+          if (newGameFlag && newGameSettings.games > 1) {
+            newGameSettings.games--
+            gamesNumber.setProperty(prop.TEXT, `${newGameSettings.games}`)
+          }
+          if (!newGameFlag){
+            setGames(false)
+            gamesNumber.setProperty(prop.TEXT, `${getGames()}`)
+          }
         }
       })
 
-      const tieBreakText = moreSettingsGroup.createWidget(widget.TEXT, {
+      
+      const superTieBreakText = moreSettingsGroup.createWidget(widget.TEXT, {
+        x: px(58),
+        y: px(250),
+        w: px(250),
+        h: px(70),
+        text: `SUPER TIEBREAK`,
+        text_size: px(30),
+        color: 0xffffff,
+        align_h: align.CENTER_H,
+        align_v: align.CENTER_V
+      })
+      
+      superTieBreakOption = createWidget(widget.SLIDE_SWITCH, {
+        x: px(SCREEN_WIDTH/2 + 100),
+        y: px(255),
+        w: px(84),
+        h: px(58),
+        select_bg: 'switch_on.png',
+        un_select_bg: 'switch_off.png',
+        slide_src: 'radio_select.png',
+        slide_select_x: 32,
+        slide_un_select_x: 8,
+        //checked: true,
+        checked_change_func: (slideSwitch, checked) => {
+          if (newGameFlag) {
+            newGameSettings.tieBreakMode = checked
+          }
+          else{
+            getSettings().tieBreakMode = checked
+            //saveSettings()
+          }
+        }
+      })
+      if (getSettings().tieBreakMode){
+        superTieBreakOption.setProperty(prop.CHECKED, true)
+      }
+      else{
+        superTieBreakOption.setProperty(prop.CHECKED, false)
+      }
+      
+      const tieBreakText = tieBreakGroup.createWidget(widget.TEXT, {
         x: px(15),
-        y: px(195),
+        y: px(115),
         w: px(200),
         h: px(170),
-        text: `TIEBREAK`,
+        text: `POINTS`,
         text_size: px(30),
         color: 0xffffff,
         align_h: align.CENTER_H,
         align_v: align.CENTER_V
       })
 
-      const tieBreakNumber = moreSettingsGroup.createWidget(widget.TEXT, {
-        x: px(SCREEN_WIDTH * 5 / 8 - 15),
-        y: px(255),
+      const tieBreakNumber = tieBreakGroup.createWidget(widget.TEXT, {
+        x: px(SCREEN_WIDTH * 5 / 8 - 12),
+        y: px(175),
         w: px(60),
         h: px(50),
         text: `${getTieBreak()}`,
@@ -253,9 +1054,9 @@ DataWidget(
         align_v: align.CENTER_V
       })
 
-      const plusTieBreakButton = moreSettingsGroup.createWidget(widget.BUTTON, {
+      const plusTieBreakButton = tieBreakGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH * 3 / 4 + 5),
-        y: px(245),
+        y: px(165),
         w: px(80),
         h: px(70),
         text: `+`,
@@ -265,14 +1066,20 @@ DataWidget(
         normal_color: 0x000000,
         press_color: 0x777777,
         click_func: () => {
-          setTieBreak(true)
-          tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
+          if (newGameFlag && newGameSettings.tieBreak < 50) {
+            newGameSettings.tieBreak++
+            tieBreakNumber.setProperty(prop.TEXT, `${newGameSettings.tieBreak}`)
+          }
+          if(!newGameFlag){
+            setTieBreak(true)
+            tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
+          }
         }
       })
 
-      const minusTieBreakButton = moreSettingsGroup.createWidget(widget.BUTTON, {
+      const minusTieBreakButton = tieBreakGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 - 45),
-        y: px(240),
+        y: px(160),
         w: px(80),
         h: px(70),
         text: `-`,
@@ -282,12 +1089,18 @@ DataWidget(
         normal_color: 0x000000,
         press_color: 0x777777,
         click_func: () => {
-          setTieBreak(false)
-          tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
+          if (newGameFlag && newGameSettings.tieBreak > 1) {
+            newGameSettings.tieBreak--
+            tieBreakNumber.setProperty(prop.TEXT, `${newGameSettings.tieBreak}`)
+          }
+          if(!newGameFlag){
+            setTieBreak(false)
+            tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
+          }
         }
       })
 
-      const tieBreakTypes = moreSettingsGroup.createWidget(widget.TEXT, {
+      /* const tieBreakTypes = moreSettingsGroup.createWidget(widget.TEXT, {
         x: px(140),
         y: px(320),
         w: px(SCREEN_WIDTH),
@@ -297,9 +1110,9 @@ DataWidget(
         color: 0x777777,
         align_h: align.LEFT,
         align_v: align.CENTER_V
-      })
+      }) */
 
-      tieBreakOption = createWidget(widget.CHECKBOX_GROUP, {
+      /* tieBreakOption = createWidget(widget.CHECKBOX_GROUP, {
         x: px(0),
         y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
@@ -309,7 +1122,7 @@ DataWidget(
         check_func: (group, index, checked) => {
         
           getSettings().tieBreakMode = checked
-          saveSettings()
+          //saveSettings()
           if(checked){
             tieBreakTypes.setProperty(prop.TEXT, 'On')
             setTieBreak(10)
@@ -322,23 +1135,20 @@ DataWidget(
             tieBreakNumber.setProperty(prop.TEXT, `${getTieBreak()}`)
           }
         }
-      }) 
+      }) */ 
 
-      const button5 = tieBreakOption.createWidget(widget.STATE_BUTTON, {
+      /* const button5 = tieBreakOption.createWidget(widget.STATE_BUTTON, {
         x: px(70),
         y: px(320),
         w: px(70),
         h: px(70)
       })
+      tieBreakOption.setProperty(prop.INIT, button5)
       if(getSettings().tieBreakMode === false){
-        tieBreakOption.setProperty(prop.INIT, button5)
         tieBreakOption.setProperty(prop.UNCHECKED, button5)
-      }
-      else{
-        tieBreakOption.setProperty(prop.INIT, button5)
-      }
+      } */
 
-      pingPongOption = createWidget(widget.CHECKBOX_GROUP, {
+      /* pingPongOption = createWidget(widget.CHECKBOX_GROUP, {
         x: px(0),
         y: TOP_OFFSET,
         w: px(SCREEN_WIDTH),
@@ -385,9 +1195,9 @@ DataWidget(
       }
       else{
         pingPongOption.setProperty(prop.INIT, button6)
-      }
+      } */
 
-      const pingPongText = moreSettingsGroup.createWidget(widget.TEXT, {
+      /* const pingPongText = moreSettingsGroup.createWidget(widget.TEXT, {
         x: px(SCREEN_WIDTH - 190),
         y: px(320),
         w: px(100),
@@ -397,9 +1207,9 @@ DataWidget(
         color: 0x777777,
         align_h: align.LEFT,
         align_v: align.CENTER_V
-      })
+      }) */
 
-      const backButton2 = moreSettingsGroup.createWidget(widget.BUTTON, {
+      /* const backButton2 = moreSettingsGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 - 60),
         y: px(SCREEN_HEIGHT - 145),
         w: px(120),
@@ -409,15 +1219,15 @@ DataWidget(
 
         click_func: () => {
           saveSettings()
-          
-          refreshUI()
-          showSettings(true, newGameFlag)
+          //refreshUI()
+          showSettingsPage(true)
+          //showSettings(true, newGameFlag)
         }
-      })
+      }) */
 
 
       // SETTINGS SCREEN
-      const moreSettingsButton = settingsGroup.createWidget(widget.BUTTON, {
+      /* const moreSettingsButton = settingsGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 + 60),
         y: px(SCREEN_HEIGHT - 150),
         w: px(100),
@@ -428,7 +1238,34 @@ DataWidget(
         click_func: () => {
           showMoreSettings(newGameFlag)
         }
-      })
+      }) */
+
+      /* const deuceBackButton = settingsGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 160),
+        y: px(SCREEN_HEIGHT - 145),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          showSportsPage()
+        }
+      }) */
+
+      /* const acceptDeuce = settingsGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 + 60),
+        y: px(SCREEN_HEIGHT - 145),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+
+          showMoreSettings()
+        }
+      }) */
 
       const deuceText = settingsGroup.createWidget(widget.TEXT, {
         x: px(0),
@@ -464,7 +1301,14 @@ DataWidget(
         check_func: (group, index, checked) => {
           
           if (checked === true){     
-            setDeuce(index)
+            if (newGameFlag) {
+              newGameSettings.deuce = index
+              //console.log("new", newGameSettings.deuce)
+            }
+            else{
+              setDeuce(index)
+            }
+            //console.log("deuce", getSettings().deuce)
           }
         }
       })
@@ -492,7 +1336,7 @@ DataWidget(
       deuceOption.setProperty(prop.INIT, buttons[getSettings().deuce])
       
       const serveTypes = settingsGroup.createWidget(widget.TEXT, {
-        x: px(120),
+        x: px(70),
         y: px(280),
         w: px(SCREEN_WIDTH),
         h: px(50),
@@ -514,8 +1358,42 @@ DataWidget(
         align_h: align.CENTER_H,
         align_v: align.CENTER_V
       })
+      
+      serveOption = createWidget(widget.SLIDE_SWITCH, {
+        x: px(SCREEN_WIDTH/2 + 90),
+        y: px(275),
+        w: px(84),
+        h: px(58),
+        select_bg: 'switch_on.png',
+        un_select_bg: 'switch_off.png',
+        slide_src: 'radio_select.png',
+        slide_select_x: 32,
+        slide_un_select_x: 8,
+        //checked: true,
+        checked_change_func: (slideSwitch, checked) => {
+          if (newGameFlag) {
+            newGameSettings.firstServe = checked
+          }
+          else{
+            setFirstServe(checked)
+          }
+          if(checked){
+            serveTypes.setProperty(prop.TEXT, 'Player 1')
+          }
+          else{
+            serveTypes.setProperty(prop.TEXT, 'Player 2')            
+          }
+        }
+      })
+      if (getSettings().firstServe){
+        serveOption.setProperty(prop.CHECKED, true)
+      }
+      else{
+        serveOption.setProperty(prop.CHECKED, false)
+        serveTypes.setProperty(prop.TEXT, 'Player 2')
+      }
 
-      serveOption = createWidget(widget.CHECKBOX_GROUP, {
+      /* serveOption = createWidget(widget.CHECKBOX_GROUP, {
         x: px(0),
         y: TOP_OFFSET,
         w: px(480),
@@ -523,8 +1401,13 @@ DataWidget(
         select_src: 'selected.png',
         unselect_src: 'unselected.png',
         check_func: (group, index, checked) => {
-          setFirstServe(checked)
-          saveSettings()
+          if (newGameFlag) {
+            newGameSettings.firstServe = checked
+          }
+          else{
+            setFirstServe(checked)
+            saveSettings()  
+          }
           if(checked){
             serveTypes.setProperty(prop.TEXT, 'Player 1')
           }
@@ -535,19 +1418,16 @@ DataWidget(
       })
 
       const button4 = serveOption.createWidget(widget.STATE_BUTTON, {
-        x: px(40),
-        y: px(280),
+        x: px(60),
+        y: px(270),
         w: px(70),
         h: px(70)
       })
       
+      serveOption.setProperty(prop.INIT, button4)
       if(getSettings().firstServe === false){
-        serveOption.setProperty(prop.INIT, button4)
         serveOption.setProperty(prop.UNCHECKED, button4)
-      }
-      else{
-        serveOption.setProperty(prop.INIT, button4)
-      }
+      } */
 
       function refreshUI() {
         
@@ -562,7 +1442,6 @@ DataWidget(
         serveImg.setProperty(prop.MORE, {
           y: px(serverPosition.y)
         })
-        //serveImg.setProperty(prop.MORE, getServer())
         
         pointText.setProperty(
           prop.TEXT,
@@ -570,7 +1449,7 @@ DataWidget(
         )
       }
 
-      const backButton = settingsGroup.createWidget(widget.BUTTON, {
+      /* const backButton = settingsGroup.createWidget(widget.BUTTON, {
         x: px(SCREEN_WIDTH / 2 - 60),
         y: px(SCREEN_HEIGHT - 145),
         w: px(120),
@@ -581,15 +1460,15 @@ DataWidget(
         click_func: () => {
           saveSettings()
           
-          if (originalSettings.firstServe != getSettings().firstServe || originalSettings.pingPong != getSettings().pingPong) {
+          /* if (originalSettings.firstServe != getSettings().firstServe || originalSettings.pingPong != getSettings().pingPong) {
             resetMatch()
             saveMatch()
-          }
+          } 
           
-          refreshUI()
-          showMatch()
+          showSettingsPage(true)
+          
         }
-      })
+      }) */
 
       //SCOREBOARD SCREEN
       // Core text
@@ -721,7 +1600,7 @@ DataWidget(
         press_src: 'settings_pressed.png',
 
         click_func: () => {
-          showSettings()
+          showSettingsPage()
         }
       })
 
@@ -747,64 +1626,120 @@ DataWidget(
         y: px(SCREEN_HEIGHT - 54) + TOP_OFFSET,
         src: 'heart.png'
       })
-      
-      /* showMatch()
-      refreshUI() */
+
+      const matchBackButton = matchGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 190),
+        y: px(SCREEN_HEIGHT - 150),
+        w: px(120),
+        h: px(80),
+        normal_src: 'backButton.png',
+        press_src: 'backButton_selected.png',
+
+        click_func: () => {
+          showMenu()
+        }
+      })
 
       //MENU SCREEN
       
       const title = menuGroup.createWidget(widget.TEXT, {
-        x: px(SCREEN_WIDTH / 2 - 150),
+        x: px(0),
         y: px(35),
-        w: px(350),
+        w: px(SCREEN_WIDTH),
         h: px(170),
         text: `PADEL & TENNIS`,
         text_size: px(40),
         color: 0xffffff,
-        align_h: align.LEFT,
+        align_h: align.CENTER_H,
         align_v: align.CENTER_V
       })
 
       const newGameButton = menuGroup.createWidget(widget.BUTTON, {
-        x: px(SCREEN_WIDTH / 2 - 80),
-        y: px(160),
-        w: px(160),
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(170),
+        w: px(280),
         h: px(50),
         text: `NEW GAME`,
         text_size: px(30),
-        color: 0xffffff,
-        radius: px(20),
+        radius: px(15),
+        /* color: 0xffffff,
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0xffffff, */
+        normal_color: 0xff00ff,
+        press_color: 0xff85ff,
+        color: 0x000000,
         click_func: () => {
           
-          resetMatch()
+          newGameFlag = true
+          newGameSettings = {
+            ...getSettings()
+          }
+          showSportsPage()
+
+          //remove
+          /* resetMatch()
           saveMatch()
           
           refreshUI()
-          showMatch()
+          showMatch() */
           
         }
       })   
 
       const resumeGameButton = menuGroup.createWidget(widget.BUTTON, {
-        x: px(SCREEN_WIDTH / 2 - 125),
-        y: px(230),
-        w: px(250),
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(240),
+        w: px(280),
         h: px(50),
         text: `RESUME GAME`,
         text_size: px(30),
-        color: 0xffffff,
-        radius: px(20),
+        radius: px(15),
+        /* color: 0xffffff,
         normal_color: 0x000000,
-        press_color: 0xffffff,
+        press_color: 0xffffff, */
+        normal_color: 0x2fabff,
+        press_color: 0x6dc4ff,
+        color: 0x000000,
         click_func: () => {
           showMatch()
           refreshUI()
         }
-      })   
+      }) 
+      
+      /* const menuSettingsButton = menuGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(310),
+        w: px(280),
+        h: px(50),
+        text: `SETTINGS`,
+        text_size: px(30),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0X444444,
+        color: 0xffffff,
+        click_func: () => {
+          showSettingsPage()
+          menuFlag = true
+        }
+      }) */
+
+      const sendMatch = menuGroup.createWidget(widget.BUTTON, {
+        x: px(SCREEN_WIDTH / 2 - 140),
+        y: px(310),
+        w: px(280),
+        h: px(50),
+        text: `SEND MATCH`,
+        text_size: px(30),
+        radius: px(15),
+        normal_color: 0x252525,
+        press_color: 0X444444,
+        color: 0xffffff,
+        click_func: () => {
+        }
+      })
       
       showMenu()
+      //showSportsPage()
     },
 
     build() {
