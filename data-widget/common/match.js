@@ -2,7 +2,7 @@ import { getSettings } from "./settings"
 
 let history = []
 
-export function createNewMatch(firstServe = true, deuce = 0, sport = "padel") {
+export function createNewMatch(firstServe = true, deuce = 0, sport = "padel", doubles = 0) {
   return {
     timestamp: Date.now(),
     player1: {
@@ -23,11 +23,16 @@ export function createNewMatch(firstServe = true, deuce = 0, sport = "padel") {
     tieBreak: false,
     firstServe: firstServe,
     deuce: deuce,
-    sport: sport
+    sport: sport,
+    doubles: doubles
   }
 }
 
 let match = createNewMatch()
+
+export function clearHistory() {
+  history = []
+}
 
 export function updateMatch() {
   match.sport = getSettings().sport  
@@ -112,7 +117,7 @@ export function deuce(){
 }
 export function resetMatch() {
   const settings = getSettings()
-  match = createNewMatch(settings.firstServe, settings.deuce, settings.sport)
+  match = createNewMatch(settings.firstServe, settings.deuce, settings.sport, settings.doubles === true ? 2 : 0)
 }
 export function undoHelper() {
 
@@ -189,11 +194,22 @@ export function pingPongMode(winner, loser, diffPoints, deuce = false, sport) {
   if (sport === "pickleball"){
     if ((match.serve === true && winner === match.player2) || (match.serve === false && winner === match.player1)){
       winner.pointIndex--
+      diffPoints = Math.abs(winner.pointIndex - loser.pointIndex)
       changeServe()
+      if(match.doubles === 2){
+        match.doubles = 1
+      }
+      else if(match.doubles === 1){
+        match.doubles = 2
+        changeServe()
+      }
     }
     if (winner.pointIndex >= getSettings().tieBreak && diffPoints >= 2){
+      saveSetScore(match.player1.pointIndex, match.player2.pointIndex)
       awardSet(winner)
-      changeServe()
+      if(match.doubles === 1){
+        match.doubles = 2
+      }
     }
   }
 }
@@ -301,20 +317,12 @@ export function playerWonPoint(player) {
       saveSetScore(match.player1.games, match.player2.games)
       awardSet(winner)
     }     
-    /////
   }
-  /* const diffSets = Math.abs(winner.sets - loser.sets)
-  // Last set TieBreak mode
-  if(settings.tieBreakMode){
-    if(diffSets === 0 && winner.sets === settings.bestOf/2 + 0.5 - 1) {
-      match.tieBreak = true
-      //settings.tieBreak = 10
-    }
-  } */
   
   // Win match
   if (winner.sets >= settings.bestOf/2 + 0.5){
     const finishedMatch = JSON.parse(JSON.stringify(match))
+    finishedMatch.duration = Date.now() - finishedMatch.timestamp
     //finishedMatch.pingPong = settings.pingPong
     
     resetMatch()

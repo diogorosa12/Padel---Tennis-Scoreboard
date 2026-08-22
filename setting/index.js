@@ -4,7 +4,10 @@ const SPORT_NAMES = {
   unknown: "Unknown",
   padel: "Padel",
   tennis: "Tennis",
-  tableTennis: "Table Tennis"
+  tableTennis: "Table Tennis",
+  pickleball: "Pickleball",
+  squash: "Squash",
+  badminton: "Badminton"
 }
 
 
@@ -312,7 +315,10 @@ AppSettingsPage({
               { name: "Unknown", value: "unknown" },
               { name: "Padel", value: "padel" },
               { name: "Tennis", value: "tennis" },
-              { name: "Table Tennis", value: "tableTennis" }
+              { name: "Table Tennis", value: "tableTennis" },
+              { name: "Pickleball", value: "pickleball" },
+              { name: "Squash", value: "squash" },
+              { name: "Badminton", value: "badminton" }
             ],
             onChange: (selection) => {
               const value = getSelectedValue(selection)

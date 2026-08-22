@@ -16,7 +16,9 @@ function getDefaultSport(service) {
 function createMatchRecord(service, match) {
   return {
     startTime: match.timestamp,
-    duration: Date.now() - match.timestamp,
+    duration: Number.isFinite(match.duration)
+      ? match.duration
+      : Date.now() - match.timestamp,
     
     sport: match.sport,
 
@@ -52,7 +54,17 @@ function getMatchHistory(service) {
 function saveMatchToHistory(service, match) {
   const history = getMatchHistory(service)
 
-  history.push(match)
+  const alreadySaved = history.some(
+    (storedMatch) => storedMatch.startTime === match.startTime
+  )
+
+  if (!alreadySaved) {
+    history.push(match)
+  }
+
+  history.sort((firstMatch, secondMatch) => {
+    return firstMatch.startTime - secondMatch.startTime
+  })
 
   service.settings.setItem(
     MATCH_HISTORY_KEY,
